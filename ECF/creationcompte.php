@@ -45,7 +45,7 @@ if (isset ($_POST["inscrire"])) {
                     <input  type="text" id="societe" name="societe" placeholder="votre société" required/>
                 </div>
                 <div class="element">
-                    <button type="submit" id="inscrire" name="inscrire">s'inscrire</button>
+                    <button class="formbutton"  type="submit" id="inscrire" name="inscrire">s'inscrire</button>
                 </div>
             </form>  
     </div>

@@ -4,21 +4,13 @@
 function checkLogin($user,$pass) {
     global $pdo;
     try {    
+        $user=strtolower($user);
         $checklo = $pdo->prepare('SELECT hashpass FROM users WHERE email=:email');
         $checklo->bindValue(':email', $user, PDO::PARAM_STR);
         $checklo->execute();
         $result= $checklo->fetch(PDO::FETCH_ASSOC);
-        if (password_verify($pass,$result["hashpass"])) {    // le mdp coincide avec le mail !
-            $token = bin2hex(random_bytes(16));
-            $settoken = $pdo->prepare("UPDATE users SET hashtoken=:token, expirationtoken=:expiration WHERE email=:email") ;
-            $settoken->bindValue(':token', hash('md5', $token), PDO::PARAM_STR);
-            $expiration = date("Y/m/d",strtotime('+1 day'));    // le token est valable 1 jour aprés la derniere visite
-            $settoken->bindValue(':expiration', $expiration, PDO::PARAM_STR);
-            $settoken->bindValue(':email', $user, PDO::PARAM_STR);
-            echo hash('md5', $token)."<br>".$expiration."<br>".$user."<br>";
-            $settoken->execute();
-            $_SESSION["token"] = $token;
-            return true;
+        if ($result && password_verify($pass,$result["hashpass"])) {    // le mdp coincide avec le mail !
+            return setLogin($user);
         }
         return false;
     }
@@ -26,8 +18,43 @@ function checkLogin($user,$pass) {
         echo "erreur : ".$e->getMessage();
         return false;
     }
+}
+function setLogin($user) {
+    global $pdo;
+    try {    
+            $token = bin2hex(random_bytes(16));
+            $settoken = $pdo->prepare("UPDATE users SET hashtoken=:token, expirationtoken=:expiration WHERE email=:email") ;
+            $settoken->bindValue(':token', hash('md5', $token), PDO::PARAM_STR);
+            $expiration = date("Y/m/d",strtotime('+1 day'));    // le token est valable 1 jour aprés la derniere visite
+            $settoken->bindValue(':expiration', $expiration, PDO::PARAM_STR);
+            $settoken->bindValue(':email', $user, PDO::PARAM_STR);
+            $settoken->execute();
+            $_SESSION["token"] = $token;
+            return true;
+        }
 
+    catch (PDOException $e) {
+        echo "erreur : ".$e->getMessage();
+        return false;
+    }
+}
 
+    function checknewpassneeded ($email) {
+        global $pdo;
+        try {    
+            $email=strtolower($email);
+            $checklo = $pdo->prepare('SELECT email,tobechanged FROM users WHERE email=:email');
+            $checklo->bindValue(':email', $email, PDO::PARAM_STR);
+            $checklo->execute();
+            $result= $checklo->fetch(PDO::FETCH_ASSOC);
+            return $result["tobechanged"]==1;   // le mdp doit être changé !
+        }
+        catch (PDOException $e) {
+            echo "erreur : ".$e->getMessage();
+            return false;
+        }
+    
+    
 }
 
 // on vérifie que le token est présent et valide dans la BDD
@@ -70,6 +97,7 @@ function createUser ($email,$pass,$nom,$prenom,$societe,$newrole) {
     global $pdo;
     try {
         if (!preg_match('/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/', $pass)) return false;
+        $email=strtolower($email);
 
         if ($newrole==1)  {  // pour un client, on recherche le conseillé le moins chargé pour lui affecter le client
             $statement1 = $pdo->prepare('SELECT idcontact,count(idContact) AS C FROM users WHERE role=1 group by idContact ORDER BY C ASC Limit 1');
@@ -89,7 +117,7 @@ function createUser ($email,$pass,$nom,$prenom,$societe,$newrole) {
         $statement->bindValue(':email', $email, PDO::PARAM_STR);
         $statement->bindValue(':role', $newrole, PDO::PARAM_INT);
         $statement->bindValue(':idcontact',$idcontact, PDO::PARAM_STR);
-        if (($newrole==2)||($newrole==1)) {  // les employés yc l'administrateur ont un matricule
+        if (($newrole==2)||($newrole==3)) {  // les employés yc l'administrateur ont un matricule
             $registrationNumber= rand(1,9999999);
         }
         else {
@@ -107,6 +135,46 @@ function createUser ($email,$pass,$nom,$prenom,$societe,$newrole) {
     }
     catch (PDOException $e) {
         echo"Échec de la connexion".$e->getMessage();
+        return false;
+    }
+}
+function resetmdp ($email) {
+ 
+   $email=strtolower($email);
+   $newpass="Nouveau-Mot2Passe";
+   $to      = $email;
+   $subject = 'Nouveau Mot de Passe Ventalis.com';
+   $message = 'Votre nouveau mot de passe est "Nouveau-Mot2passe"';
+   $headers = 'From: webmaster@ventalis.com' ;
+//   mail($to, $subject, $message, $headers);
+
+    return modifmdp($email,$newpass,1); //modif du mdp en marquant qu'il devra être changé à la prochaine connexion
+}
+
+function modifmdp ($email,$pass,$tobechanged) {
+    global $pdo;
+
+
+    try {
+        $checkuser = $pdo->prepare('SELECT count(email) AS C FROM users WHERE email=:email');
+        $checkuser->bindValue(':email', $email, PDO::PARAM_STR);
+        $checkuser->execute();
+        $result= $checkuser->fetch(PDO::FETCH_ASSOC);
+    
+        if ($result["C"] != 1) {    // le compte n'existe pas!
+            echo "<br><br>le compte n'existe pas !";
+            return false; 
+        }    
+
+        $statement = $pdo->prepare("UPDATE users SET hashpass=:hashpass, tobechanged=:tobechanged WHERE email=:email");
+        $statement->bindValue(':email', $email, PDO::PARAM_STR);
+        $statement->bindValue(':tobechanged', $tobechanged, PDO::PARAM_STR);
+        $statement->bindValue(':hashpass', password_hash($pass,PASSWORD_BCRYPT), PDO::PARAM_STR);
+        $statement->execute();
+        return true;
+    }
+    catch (PDOException $e) {
+        echo "<br><br>erreur interne !";
         return false;
     }
 }

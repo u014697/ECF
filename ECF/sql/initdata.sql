@@ -7,16 +7,16 @@ INSERT INTO Users (name,firstName,company,email,registrationNumber,hashpass,role
 -- creation des employés (role=2)
 
 INSERT INTO Users (name,firstName,company,email,registrationNumber,hashpass,role)
-        VALUES ('John', 'Ventalis', 'Ventalis', 'johnVentalis@ventalis.com',1002,'provisoire',2);
+        VALUES ('John', 'Ventalis', 'Ventalis', 'johnventalis@ventalis.com',1002,'provisoire',2);
 INSERT INTO Users (name,firstName,company,email,registrationNumber,hashpass,role)
-        VALUES ('Jane', 'Ventalis', 'Ventalis', 'janeVentalis@ventalis.com',1003,'provisoire',2);
+        VALUES ('Jane', 'Ventalis', 'Ventalis', 'janeventalis@ventalis.com',1003,'provisoire',2);
 
 -- creation des utilisateurs (role=1)
 
 INSERT INTO Users (name,firstName,company,email,idcontact,hashpass,role)
-        VALUES ('John', 'Doe', 'JD inc.', 'johnDoe@JD.com',2,'provisoire',1);
+        VALUES ('John', 'Doe', 'JD inc.', 'johndoe@jd.com',2,'provisoire',1);
 INSERT INTO Users (name,firstName,company,email,idcontact,hashpass,role)
-        VALUES ('Jane', 'Doe', 'JD inc.', 'janeDoe@JD.com',2,'provisoire',1);
+        VALUES ('Jane', 'Doe', 'JD inc.', 'janedoe@jd.com',2,'provisoire',1);
 
 
 -- creation des catégories
