@@ -316,6 +316,25 @@ function sendmessage ($objet,$message) {
     }    
 
 }
+function getproducts($filtre) {
+    global $pdo;
+
+    try {
+        if ($filtre=='toutes') {
+            $getpro = $pdo->prepare('SELECT idProduct,label,price FROM Products');   
+        }
+        else {
+            $getpro = $pdo->prepare('SELECT idProduct,label,price FROM Products WHERE categorie=:categorie');   
+            $getpro->bindValue(':categorie', $filtre, PDO::PARAM_STR);
+        }
+        $getpro->execute();
+        return $getpro->fetchAll(PDO::FETCH_ASSOC);
+    }
+    catch (PDOException $e) {
+        return false;
+    }    
+
+}
 function getclients() {
     global $pdo;
 

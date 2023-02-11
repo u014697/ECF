@@ -10,7 +10,7 @@ if (isset ($_GET["deconnexion"])) {
         <div class="menu">
             <a href="acceuil.php"><img class="left" src="image/logo.png" height="40px" width="40px"/></a>
             <a class="menulink" href="acceuil.php">qui sommes nous ?</a>
-            <a class="menulink" href="nosprestations.php">nos prestations</a>
+            <a class="menulink" href="catalogue.php">nos produits</a>
             <a class="menulink" href="contact.php">contact</a>
             <?php
                 if ($role==3) {
