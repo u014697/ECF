@@ -14,7 +14,7 @@ if (isset ($_GET["deconnexion"])) {
             <a class="menulink" href="contact.php">contact</a>
             <?php
                 if ($role==3) {
-                    echo '<a class="menulink" href="admin.php">administration</a>';
+                    echo '<a class="menulink" href="administration.php">administration</a>';
                 } 
                 elseif ($role==2) {
                     echo '<a class="menulink" href="intranet.php">intranet</a>';

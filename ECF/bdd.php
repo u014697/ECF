@@ -183,6 +183,7 @@ function sendmessage ($objet,$message) {
 
         if (!isset ($_SESSION["token"])) return false;
     
+    try {
         // on commence par retrouver l'identité de l'emetteur du message (le client)
         $checktok = $pdo->prepare('SELECT idcontact,email  FROM users WHERE hashtoken=:hashtoken');
         $checktok->bindValue(':hashtoken', hash('md5', $_SESSION["token"]), PDO::PARAM_STR);
@@ -200,11 +201,49 @@ function sendmessage ($objet,$message) {
         //enfin, on envoi le mail
 
         $to      = $vendor["email"];
-        $subject = $objet;
         $message = 'Votre nouveau mot de passe est "Nouveau-Mot2passe"';
         $headers = 'From: '.$client["email"];
  //   mail($to, $objet, $message, $headers);
+        return true;
+    }
+    catch (PDOException $e) {
+        echo"Échec de l'envoi'";
+        return false;
+    }
+
   }
+
+  function sendtoclient ($client,$objet,$message) {
+    global $pdo;
+
+        if (!isset ($_SESSION["token"])) return false;
+    
+        try {
+                    // on commence par retrouver l'identité de l'emetteur du message (l'employé)
+        $checktok = $pdo->prepare('SELECT idcontact,email  FROM users WHERE hashtoken=:hashtoken');
+        $checktok->bindValue(':hashtoken', hash('md5', $_SESSION["token"]), PDO::PARAM_STR);
+        $checktok->execute();
+        $employe= $checktok->fetch(PDO::FETCH_ASSOC);
+        if (!$employe) return false;
+
+        // ensuite, on retrouve les coordonnées du client
+        $checkuser = $pdo->prepare('SELECT email FROM users WHERE idUser=:iduser');  //on récupère le conseillé du client
+        $checkuser->bindValue(':iduser', $client, PDO::PARAM_INT);
+        $checkuser->execute();
+        $user= $checkuser->fetch(PDO::FETCH_ASSOC);
+        if (!$user) return false;
+        $to      = $user["email"];
+        $headers = 'From: '.$employe["email"];
+ //   mail($to, $objet, $message, $headers);
+        return true;
+
+        }
+        catch (PDOException $e) {
+            echo"Échec de l'envoi'";
+            return false;
+        }
+  }
+
   function getCommande () {
     global $pdo;
 
@@ -226,6 +265,78 @@ function sendmessage ($objet,$message) {
         return $checkorder->fetchAll(PDO::FETCH_ASSOC);
   }
  
+  function createcategorie ($categorie) {
+    global $pdo;
+
+        if (!isset ($_SESSION["token"])) return false;
+ 
+        try {
+            $createcat = $pdo->prepare('INSERT INTO categories(categorie) VALUES (:categorie) ');   
+            $createcat->bindValue(':categorie', $categorie, PDO::PARAM_STR);
+            $createcat->execute();
+            return true;   
+        }
+        catch (PDOException $e) {
+            return false;
+        }    
+  }
+ 
+  function createProduct ($label,$categorie,$picture,$description,$price) {
+    global $pdo;
+
+        if (!isset ($_SESSION["token"])) return false;
+ 
+        try {
+            $createprod = $pdo->prepare('INSERT INTO products(label,categorie,picture,description,price,stock) 
+                                        VALUES (:label,:categorie,:picture,:description,:price,100000) ');   
+            $createprod->bindValue(':label', $label, PDO::PARAM_STR);
+            $createprod->bindValue(':categorie', $categorie, PDO::PARAM_STR);
+            $createprod->bindValue(':picture', $picture, PDO::PARAM_STR);
+            $createprod->bindValue(':description', $description, PDO::PARAM_STR);
+            $createprod->bindValue(':price', $price, PDO::PARAM_STR);
+            $createprod->execute();
+            return true;   
+        }
+        catch (PDOException $e) {
+            echo $e->getMessage();
+            return false;
+        }    
+  }
+ 
+  function getcategories() {
+    global $pdo;
+
+    try {
+        $getcat = $pdo->prepare('SELECT * FROM Categories');   
+        $getcat->execute();
+        return $getcat->fetchAll(PDO::FETCH_ASSOC);
+    }
+    catch (PDOException $e) {
+        return null;
+    }    
+
+}
+function getclients() {
+    global $pdo;
+
+    try {
+        // on commence par retrouver l'identité de l'employé par son token
+        $checktok = $pdo->prepare('SELECT iduser  FROM users WHERE hashtoken=:hashtoken');
+        $checktok->bindValue(':hashtoken', hash('md5', $_SESSION["token"]), PDO::PARAM_STR);
+        $checktok->execute();
+        $employe= $checktok->fetch(PDO::FETCH_ASSOC);
+        //ensuite on récupere ses clients
+        $getclients= $pdo->prepare('SELECT * FROM Users WHERE idContact=:contact');   
+        $getclients->bindValue(':contact', $employe["iduser"], PDO::PARAM_STR);
+        $getclients->execute();
+        return $getclients->fetchAll(PDO::FETCH_ASSOC);
+    }
+    catch (PDOException $e) {
+        return null;
+    }    
+
+}
+
 function cancelUser () {
     /* the token will be used to know which account is to be deleted */
     unset($_SESSION['token']);

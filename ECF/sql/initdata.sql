@@ -2,21 +2,21 @@
 -- le hash 'provisoire' entrainera une pricédure de choix d'un mdp par l'utilisateur a sa première tentative de connection
 
 INSERT INTO Users (name,firstName,company,email,registrationNumber,hashpass,role)
-        VALUES ('The', 'Bigboss', 'Ventalis', 'thebigboss@ventalis.com',1001,'provisoire',3);
+        VALUES ('Bigboss','The',  'Ventalis', 'thebigboss@ventalis.com',1001,'provisoire',3);
 
 -- creation des employés (role=2)
 
 INSERT INTO Users (name,firstName,company,email,registrationNumber,hashpass,role)
-        VALUES ('John', 'Ventalis', 'Ventalis', 'johnventalis@ventalis.com',1002,'provisoire',2);
+        VALUES ('Ventalis','John',  'Ventalis', 'johnventalis@ventalis.com',1002,'provisoire',2);
 INSERT INTO Users (name,firstName,company,email,registrationNumber,hashpass,role)
-        VALUES ('Jane', 'Ventalis', 'Ventalis', 'janeventalis@ventalis.com',1003,'provisoire',2);
+        VALUES ('Ventalis','Jane',  'Ventalis', 'janeventalis@ventalis.com',1003,'provisoire',2);
 
 -- creation des utilisateurs (role=1)
 
 INSERT INTO Users (name,firstName,company,email,idcontact,hashpass,role)
-        VALUES ('John', 'Doe', 'JD inc.', 'johndoe@jd.com',2,'provisoire',1);
+        VALUES ('Doe','John',  'JD inc.', 'johndoe@jd.com',2,'provisoire',1);
 INSERT INTO Users (name,firstName,company,email,idcontact,hashpass,role)
-        VALUES ('Jane', 'Doe', 'JD inc.', 'janedoe@jd.com',2,'provisoire',1);
+        VALUES ('Doe','Jane',  'JD inc.', 'janedoe@jd.com',2,'provisoire',1);
 
 
 -- creation des catégories
