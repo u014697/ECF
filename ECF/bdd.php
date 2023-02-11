@@ -302,6 +302,52 @@ function sendmessage ($objet,$message) {
             return false;
         }    
   }
+
+  function addtocart ($idproduct,$quantity,$price) {
+    global $pdo;
+
+        if (!isset ($_SESSION["token"])) return false;
+ 
+        try {
+            // on commence par identifier le client via son token
+            $checktok = $pdo->prepare('SELECT idUser  FROM users WHERE hashtoken=:hashtoken');
+            $checktok->bindValue(':hashtoken', hash('md5', $_SESSION["token"]), PDO::PARAM_STR);
+            $checktok->execute();
+            $user= $checktok->fetch(PDO::FETCH_ASSOC);
+            if (!$user) return false;
+    
+            // puis on regarde si il a un panier en cours dans la table orders 
+            $getorder = $pdo->prepare('SELECT idOrder  FROM orders WHERE idUser=:user AND state=0');
+            $getorder->bindValue(':user', $user["idUser"], PDO::PARAM_STR);
+            $getorder->execute();
+            $order= $getorder->fetch(PDO::FETCH_ASSOC);
+
+            //si pas de panier en cours, on le crée dans la table orders
+            if (!$order) {
+                $setorder = $pdo->prepare('INSERT INTO orders(idUser,state) VALUES (:user,0) ');
+                $setorder->bindValue(':user', $user["idUser"], PDO::PARAM_STR);
+                $setorder->execute();
+                $getorder = $pdo->prepare('SELECT idOrder  FROM orders WHERE idUser=:user AND state=0');
+                $getorder->bindValue(':user', $user["idUser"], PDO::PARAM_STR);
+                $getorder->execute();
+                $order= $getorder->fetch(PDO::FETCH_ASSOC);   
+            }
+            //enfin on crée le cart element
+
+            $atc = $pdo->prepare('INSERT INTO cartelements(idProduct,volume,price,idOrder) 
+                                        VALUES (:idproduct,:volume,:price,:idorder) ');   
+            $atc->bindValue(':idproduct', $idproduct, PDO::PARAM_STR);
+            $atc->bindValue(':volume', $quantity, PDO::PARAM_STR);
+            $atc->bindValue(':price', $price, PDO::PARAM_STR);
+            $atc->bindValue(':idorder', $order["idOrder"], PDO::PARAM_STR);
+            $atc->execute();
+            return true;   
+        }
+        catch (PDOException $e) {
+            echo $e->getMessage();
+            return false;
+        }    
+  }
  
   function getcategories() {
     global $pdo;
@@ -334,6 +380,20 @@ function getproducts($filtre) {
         return false;
     }    
 
+}
+// extraction des caracteristiques du produit No $id
+function getdetailproduct($id) {
+    global $pdo;
+
+    try {
+        $getpro = $pdo->prepare('SELECT * FROM Products WHERE idProduct=:id');   
+        $getpro->bindValue(':id', $id, PDO::PARAM_INT);
+        $getpro->execute();
+        return $getpro->fetch(PDO::FETCH_ASSOC);
+    }
+    catch (PDOException $e) {
+        return false;
+    }    
 }
 function getclients() {
     global $pdo;

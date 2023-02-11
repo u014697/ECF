@@ -6,8 +6,9 @@ body {
     background-size: 100%;
 }
 
-
-
+h2 {
+    text-align:center;
+}
 .menu {
     position : absolute;
     top :0%;
@@ -88,6 +89,7 @@ footer {
 
 .element{
     height: 2.5rem;
+    min-width:15rem;
 }
 
 .container {
@@ -95,10 +97,11 @@ footer {
     height:95%;
     display: flex;
     align-items: center;
-    justify-content: center;
-    flex-direction: row;
     justify-content: space-around;
+    flex-direction: row;
+    flex-wrap:nowrap;
 }
+
 
 .formulaire{
     width: auto;
@@ -178,6 +181,15 @@ footer {
     padding : 1rem;
 }
 
+.formul {
+    border : 1px black solid;
+    border-radius : 1rem;
+    padding-right : 1rem;
+    padding-top : 1rem;
+    padding-bottom : 1rem;
+
+}
+
 label {
     float :left;
     min-width:8rem;
@@ -199,5 +211,4 @@ textarea {
 
 td {
     text-align: center;
-    border : 1px black solid;
 }
