@@ -146,5 +146,15 @@ label {
 
 input {
     border-radius: 1rem;
-    width:15rem;
+    min-width:15rem;
+}
+
+textarea {
+    border-radius: 1rem;
+    min-width:15rem;
+}
+
+td {
+    text-align: center;
+    border : 1px black solid;
 }

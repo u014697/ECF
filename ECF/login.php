@@ -7,7 +7,7 @@ require "head.php";
 $message="";
 $enternewpass=false;
 if (isset ($_POST["connexion"])) {             // l'utilisateur vient d'entrer ses coordonnées de connexion
-    if (checklogin ($_POST["email"],$_POST["password"])) {   // on vérifie qu'ils sont correct
+    if (isset($_POST["password"]) && (checklogin ($_POST["email"],$_POST["password"]))) {   // on vérifie qu'ils sont correct
         if (checknewpassneeded($_POST["email"])) {          // on verifie ensuite si me mdp est marqué "a changer"
             if (isset ($_POST["npassword"])) {              // enfn on regarde si le nouveau password a été renseigné
                 modifmdp ($_POST["email"],$_POST["npassword"],0);
@@ -51,7 +51,7 @@ elseif (isset ($_POST["mdpoublie"])) {
                 </div>
                 <div>
                     <label for="password">Password :</label>
-                    <input type="password" id="password" name="password" required pattern="(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}"/>
+                    <input type="password" id="password" name="password"  pattern="(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}"/>
                     <p class="libellemdp">votre mot de passe doit contenir au moins 8 caractères dont au moins une majuscule, une minuscule et un caractère spécial</p>
                 </div>
                 <?php

@@ -178,7 +178,54 @@ function modifmdp ($email,$pass,$tobechanged) {
         return false;
     }
 }
+function sendmessage ($objet,$message) {
+    global $pdo;
 
+        if (!isset ($_SESSION["token"])) return false;
+    
+        // on commence par retrouver l'identité de l'emetteur du message (le client)
+        $checktok = $pdo->prepare('SELECT idcontact,email  FROM users WHERE hashtoken=:hashtoken');
+        $checktok->bindValue(':hashtoken', hash('md5', $_SESSION["token"]), PDO::PARAM_STR);
+        $checktok->execute();
+        $client= $checktok->fetch(PDO::FETCH_ASSOC);
+        if (!$client) return false;
+
+        // ensuite, on retrouve les coordonnées de son conseillé
+        $checkuser = $pdo->prepare('SELECT email FROM users WHERE idcontact=:idcontact');  //on récupère le conseillé du client
+        $checkuser->bindValue(':idcontact', $client["idcontact"], PDO::PARAM_STR);
+        $checkuser->execute();
+        $vendor= $checkuser->fetch(PDO::FETCH_ASSOC);
+        if (!$vendor) return false;
+
+        //enfin, on envoi le mail
+
+        $to      = $vendor["email"];
+        $subject = $objet;
+        $message = 'Votre nouveau mot de passe est "Nouveau-Mot2passe"';
+        $headers = 'From: '.$client["email"];
+ //   mail($to, $objet, $message, $headers);
+  }
+  function getCommande () {
+    global $pdo;
+
+        if (!isset ($_SESSION["token"])) return false;
+    
+        // on recherche dans users le client correspondant au token de connexion
+        // puis, avec comme clef son identifiant, on trouve les commandes dans la table orders
+        // puis avec comme clef les numéros de commande, on trouve les éléments de chaque commande dans carelement
+        // enfin, on cherche les détails de chaque produit commandé.
+        $checkorder = $pdo->prepare('SELECT users.iduser,orders.idorder,orders.state,cartelements.idproduct,cartelements.volume,cartelements.price,products.label 
+                                    FROM users
+                                    JOIN orders ON users.iduser=orders.iduser   
+                                    JOIN cartelements ON orders.idorder=cartelements.idorder 
+                                    JOIN products ON cartelements.idproduct=products.idproduct 
+                                    WHERE hashtoken=:hashtoken 
+                                    ORDER BY orders.idorder DESC');   
+        $checkorder->bindValue(':hashtoken', hash('md5', $_SESSION["token"]), PDO::PARAM_STR);
+        $checkorder->execute();
+        return $checkorder->fetchAll(PDO::FETCH_ASSOC);
+  }
+ 
 function cancelUser () {
     /* the token will be used to know which account is to be deleted */
     unset($_SESSION['token']);
