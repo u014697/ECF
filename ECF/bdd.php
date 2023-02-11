@@ -349,6 +349,95 @@ function sendmessage ($objet,$message) {
         }    
   }
  
+  function getcart () {
+    global $pdo;
+
+        if (!isset ($_SESSION["token"])) return false;
+ 
+        try {
+            // on commence par identifier le client via son token
+            $checktok = $pdo->prepare('SELECT idUser  FROM users WHERE hashtoken=:hashtoken');
+            $checktok->bindValue(':hashtoken', hash('md5', $_SESSION["token"]), PDO::PARAM_STR);
+            $checktok->execute();
+            $user= $checktok->fetch(PDO::FETCH_ASSOC);
+            if (!$user) return false;
+    
+            // puis on regarde si il a un panier en cours dans la table orders 
+            $getorder = $pdo->prepare('SELECT idOrder  FROM orders WHERE idUser=:user AND state=0');
+            $getorder->bindValue(':user', $user["idUser"], PDO::PARAM_STR);
+            $getorder->execute();
+            $order= $getorder->fetch(PDO::FETCH_ASSOC);
+            if(!$order) return false;
+            
+            //enfin on lit les cart element
+
+            $atc = $pdo->prepare('SELECT cartelements.idCartElement,cartelements.idProduct,cartelements.idProduct,cartelements.volume,cartelements.price,cartelements.idOrder,products.label FROM cartelements 
+                                        JOIN products ON products.idProduct=cartelements.idProduct
+                                        WHERE idOrder=:idorder');   
+            $atc->bindValue(':idorder', $order["idOrder"], PDO::PARAM_STR);
+            $atc->execute();   
+            return $atc->fetchAll(PDO::FETCH_ASSOC);
+        }
+        catch (PDOException $e) {
+            echo $e->getMessage();
+            return false;
+        }    
+  }
+
+  function erasecartelement ($idelement) {
+    global $pdo;
+
+        if (!isset ($_SESSION["token"])) return false;
+ 
+        try {
+            // on commence par identifier le client via son token
+            $checktok = $pdo->prepare('SELECT idUser  FROM users WHERE hashtoken=:hashtoken');
+            $checktok->bindValue(':hashtoken', hash('md5', $_SESSION["token"]), PDO::PARAM_STR);
+            $checktok->execute();
+            $user= $checktok->fetch(PDO::FETCH_ASSOC);
+            if (!$user) return false;
+    
+            //enfin on efface le cart element
+
+            $atc = $pdo->prepare('DELETE FROM cartelements
+                                        WHERE idCartElement=:idelement');   
+            $atc->bindValue(':idelement', $idelement, PDO::PARAM_STR);
+            $atc->execute();   
+            return true;
+        }
+        catch (PDOException $e) {
+            echo $e->getMessage();
+            return false;
+        }    
+  }
+ 
+  //confirmation de commande du panier en cours
+  function confirmorder () {
+    global $pdo;
+
+        if (!isset ($_SESSION["token"])) return false;
+ 
+        try {
+            // on commence par identifier le client via son token
+            $checktok = $pdo->prepare('SELECT idUser  FROM users WHERE hashtoken=:hashtoken');
+            $checktok->bindValue(':hashtoken', hash('md5', $_SESSION["token"]), PDO::PARAM_STR);
+            $checktok->execute();
+            $user= $checktok->fetch(PDO::FETCH_ASSOC);
+            if (!$user) return false;
+    
+            //enfin on passe le panier en commande
+
+            $atc = $pdo->prepare('UPDATE orders SET state=1 WHERE state=0 AND idUser=:user');
+            $atc->bindValue(':user', $user["idUser"], PDO::PARAM_STR);
+            $atc->execute();   
+            return true;
+        }
+        catch (PDOException $e) {
+            echo $e->getMessage();
+            return false;
+        }    
+  }
+ 
   function getcategories() {
     global $pdo;
 
