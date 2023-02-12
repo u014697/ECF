@@ -25,12 +25,12 @@ if (isset ($_POST["connexion"])) {             // l'utilisateur vient d'entrer s
         } 
     }
     else {
-        $message="<br><br>identifiants non reconnus";
+        $message="identifiants non reconnus";
     }
 }
 elseif (isset ($_POST["mdpoublie"])) {
     resetmdp($_POST["email"]);
-    $message="<br><br>un mot de passe provisoire vous a été envoyé par email";
+    $message="un mot de passe provisoire vous a été envoyé par email";
 }
 ?>
 <body>
@@ -38,8 +38,8 @@ elseif (isset ($_POST["mdpoublie"])) {
 
     <?php
        require "header.php";
-       echo $message;
     ?>
+    <?php require "console.php" ?>
 
     <main>
 

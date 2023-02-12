@@ -102,7 +102,15 @@ footer {
     flex-wrap:nowrap;
 }
 
-
+.console {
+    background-color:black;
+    color:#707070;
+    border-radius:0.5rem;
+    min-width:30%;
+    position:absolute;
+    left:5%;
+    top:7%;
+}
 .formulaire{
     width: auto;
     height: auto;  

@@ -16,25 +16,26 @@ require "head.php";
         $message="";   
         if (isset($_GET["article"])&&is_numeric($_GET["article"])) {
             if (erasecartelement($_GET["article"])){
-                echo "<br><br> article effacé";
+                $message= "article effacé";
             }
             else {
-                echo "<br><br> echec de l'effacement d'article";
+                $message="echec de l'effacement d'article";
 
             } 
         } 
         if (isset($_POST["commander"])) {
             if (confirmorder()) {
-                echo "<br><br> commande effectuée";
+                $message= "commande effectuée";
             }
             else {
-                echo "<br><br> echec de commande";
+                $message= "echec de commande";
 
             } 
        }
     ?>
     <main>
-    <?php echo $message; ?>
+    <?php require "console.php" ?>
+
 
     <div class="formulaire">
         <h2>Mon Panier</h2>

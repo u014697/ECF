@@ -16,21 +16,22 @@ require "head.php";
         $message="";
         if (isset ($_POST["envoyer"])) {
             if (!sendmessage($_POST["objet"],$_POST["message"])) {
-            $message="<br><br>echec de l'envoi du message";
+            $message="echec de l'envoi du message";
             }
         }
         elseif (isset ($_POST["creer"])) {
             if (createUser ($_POST["email"],$_POST["password"],$_POST["nom"],$_POST["prenom"],"Ventalis",2)) {
-                $message="<br><br>modification effectuée";
+                $message="modification effectuée";
             }
         else {
-            $message="<br><br>echec de modification";
+            $message="echec de modification";
             }
         }
     ?>
     <main>
     <div>
-    <?php echo $message; ?>
+    <?php require "console.php" ?>
+
 
     <div class="formulairegauche">
         <h2>mes commandes</h2>

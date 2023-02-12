@@ -29,19 +29,19 @@ require "head.php";
                     move_uploaded_file($nom, $nomdestination);
                 }
                 else {
-                    $message="<br><br>La création a échouée";
+                    $message="La création a échouée";
                 }   
             }
             else {
-                $message ="<br><br> erreur dans le chargement de l'image";
+                $message ="erreur dans le chargement de l'image";
             }
         }
         elseif (isset ($_POST["envoyer"])) {
             if(sendtoclient($_POST["radio"],$_POST["objet"],$_POST["message"])) {
-                $message ="<br><br> le message a été envoyé";
+                $message ="le message a été envoyé";
             }
             else {
-                $message ="<br><br>erreur d'envoi du message";
+                $message ="erreur d'envoi du message";
             }
 
         }
@@ -49,7 +49,7 @@ require "head.php";
     ?>
     <main>
     <div>
-    <?php echo $message; ?>
+    <?php require "console.php" ?>
 
     <div class="formulaire1sur3">
         <h2>Créer une catégorie</h2>

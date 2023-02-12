@@ -15,22 +15,22 @@ require "head.php";
         $message="";    
         if(isset($_POST["addtocart"])) {
             if (addtocart($_POST["id"],$_POST["quantite"],$_POST["prix"])){
-                $message="<br><br>Produit ajouté au panier avec succes !";            
+                $message="Produit ajouté au panier avec succes !";            
             }
             else {
-                $message="<br><br>echec d'ajout du produit dans le panier !";                          
+                $message="echec d'ajout du produit dans le panier !";                          
             }
         }
         if (isset($_GET["article"])&&is_numeric($_GET["article"])) {
             $article=getdetailproduct($_GET["article"]);
         }
         else {
-            $message="<br><br>Produit inconnu !";
+            $message="Produit inconnu !";
         }
     ?>
     <main>
-    <?php echo $message; 
-    ?>
+    <?php require "console.php" ?>
+
     <div class="formulaire">
         <h2>Détail produit</h2>
         <table>

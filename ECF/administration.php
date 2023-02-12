@@ -16,10 +16,10 @@ require "head.php";
         $message="";
         if (isset ($_POST["modifmdp"])) {
             if (modifmdp ($_POST["email"],$_POST["password"],0)) {
-                $message="<br><br>modification effectuée";
+                $message="modification effectuée";
             }
         else {
-            $message="<br><br>echec de modification";
+            $message="echec de modification";
             }
         }
         elseif (isset ($_POST["creer"])) {
@@ -27,13 +27,13 @@ require "head.php";
                 $message="<br><br>modification effectuée";
             }
         else {
-            $message="<br><br>echec de modification";
+            $message="echec de modification";
             }
         }
     ?>
     <main>
     <div>
-    <?php echo $message; ?>
+    <?php require "console.php" ?>
 
     <div class="formulairegauche">
         <h2>Reinitialisation MDP</h2>

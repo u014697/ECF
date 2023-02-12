@@ -16,7 +16,7 @@ require "head.php";
     ?>
     <main>
     <div>
-    <?php echo $message; ?>
+    <?php require "console.php" ?>
 
     <div class="formulaire">
         <h2>Catalogue</h2>
