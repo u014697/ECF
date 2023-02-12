@@ -9,7 +9,10 @@ require "head.php";
 
     <?php
        require "header.php";
-       if ($role!=3) header ("location:login.php");
+       if ($role!=3) {
+        $_SESSION["requested_uri"]="administration.php";
+        header ("location:login.php");
+       }
     ?>
     
     <?php

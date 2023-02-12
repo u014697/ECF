@@ -132,10 +132,10 @@ function createUser ($email,$pass,$nom,$prenom,$societe,$newrole) {
 
         $statement = $pdo->prepare("INSERT INTO users(name,firstname,company,email,idcontact,registrationnumber,hashpass,hashtoken,expirationtoken,role)
            VALUES(:nom,:prenom,:company,:email,:idcontact,:registrationnumber,:hashpass,:hashtoken,:expirationToken,:role)");
-        $statement->bindValue(':nom', $nom, PDO::PARAM_STR);
-        $statement->bindValue(':prenom', $prenom, PDO::PARAM_STR);
-        $statement->bindValue(':company', $societe, PDO::PARAM_STR);
-        $statement->bindValue(':email', $email, PDO::PARAM_STR);
+        $statement->bindValue(':nom', htmlspecialchars($nom), PDO::PARAM_STR);
+        $statement->bindValue(':prenom', htmlspecialchars($prenom), PDO::PARAM_STR);
+        $statement->bindValue(':company', htmlspecialchars($societe), PDO::PARAM_STR);
+        $statement->bindValue(':email', htmlspecialchars($email), PDO::PARAM_STR);
         $statement->bindValue(':role', $newrole, PDO::PARAM_INT);
         $statement->bindValue(':idcontact',$idcontact, PDO::PARAM_STR);
         if (($newrole==2)||($newrole==3)) {  // les employés yc l'administrateur ont un matricule
@@ -288,7 +288,7 @@ function sendmessage ($objet,$message) {
  
         try {
             $createcat = $pdo->prepare('INSERT INTO categories(categorie) VALUES (:categorie) ');   
-            $createcat->bindValue(':categorie', $categorie, PDO::PARAM_STR);
+            $createcat->bindValue(':categorie', htmlspecialchars($categorie), PDO::PARAM_STR);
             $createcat->execute();
             return true;   
         }
@@ -307,11 +307,11 @@ function sendmessage ($objet,$message) {
         try {
             $createprod = $pdo->prepare('INSERT INTO products(label,categorie,picture,description,price,stock) 
                                         VALUES (:label,:categorie,:picture,:description,:price,100000) ');   
-            $createprod->bindValue(':label', $label, PDO::PARAM_STR);
-            $createprod->bindValue(':categorie', $categorie, PDO::PARAM_STR);
+            $createprod->bindValue(':label', htmlspecialchars($label), PDO::PARAM_STR);
+            $createprod->bindValue(':categorie', htmlspecialchars($categorie), PDO::PARAM_STR);
             $createprod->bindValue(':picture', $picture, PDO::PARAM_STR);
-            $createprod->bindValue(':description', $description, PDO::PARAM_STR);
-            $createprod->bindValue(':price', $price, PDO::PARAM_STR);
+            $createprod->bindValue(':description', htmlspecialchars($description), PDO::PARAM_STR);
+            $createprod->bindValue(':price', htmlspecialchars($price), PDO::PARAM_STR);
             $createprod->execute();
             return true;   
         }
@@ -354,8 +354,8 @@ function sendmessage ($objet,$message) {
             $atc = $pdo->prepare('INSERT INTO cartelements(idProduct,volume,price,idOrder) 
                                         VALUES (:idproduct,:volume,:price,:idorder) ');   
             $atc->bindValue(':idproduct', $idproduct, PDO::PARAM_STR);
-            $atc->bindValue(':volume', $quantity, PDO::PARAM_STR);
-            $atc->bindValue(':price', $price, PDO::PARAM_STR);
+            $atc->bindValue(':volume', htmlspecialchars($quantity), PDO::PARAM_STR);
+            $atc->bindValue(':price', htmlspecialchars($price), PDO::PARAM_STR);
             $atc->bindValue(':idorder', $order["idOrder"], PDO::PARAM_STR);
             $atc->execute();
             return true;   

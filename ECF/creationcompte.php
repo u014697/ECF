@@ -9,7 +9,7 @@ require "head.php";
 <?php
 if (isset ($_POST["inscrire"])) {
     if (createUser ($_POST["email"],$_POST["password"],$_POST["nom"],$_POST["prenom"],$_POST["societe"],1)) {
-        header ("location:acceuil.php");
+        header ("location:login.php");
     }
 }
 ?>

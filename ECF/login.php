@@ -12,8 +12,13 @@ if (isset ($_POST["connexion"])) {             // l'utilisateur vient d'entrer s
             if (isset ($_POST["npassword"])) {              // enfn on regarde si le nouveau password a été renseigné
                 modifmdp ($_POST["email"],$_POST["npassword"],0);
                 setlogin($_POST["email"]);
-                header ("location:acceuil.php"); 
-            }
+                if (isset($_SESSION["requested_uri"])) {
+                    header ("location:".$_SESSION["requested_uri"]); 
+                }
+                else {
+                    header ("location:acceuil.php"); 
+                }
+                }
             else {
                 $message="<br><br>Modifiez votre mot de passe !";
                 $enternewpass=true;
@@ -21,7 +26,13 @@ if (isset ($_POST["connexion"])) {             // l'utilisateur vient d'entrer s
             }
          }
         else {
-            header ("location:acceuil.php"); 
+            if (isset($_SESSION["requested_uri"])) {
+                header ("location:".$_SESSION["requested_uri"]); 
+            }
+            else {
+                header ("location:acceuil.php"); 
+            }
+
         } 
     }
     else {
@@ -29,8 +40,13 @@ if (isset ($_POST["connexion"])) {             // l'utilisateur vient d'entrer s
     }
 }
 elseif (isset ($_POST["mdpoublie"])) {
-    resetmdp($_POST["email"]);
-    $message="un mot de passe provisoire vous a été envoyé par email";
+    if (resetmdp($_POST["email"])) {
+        $message="un mot de passe provisoire vous a été envoyé par email";
+    }
+    else {
+        $message="echec d'envoi du mot de passe par email";
+    }
+    
 }
 ?>
 <body>
@@ -68,9 +84,16 @@ elseif (isset ($_POST["mdpoublie"])) {
                 <div class="element">
                     <button class="formbutton" type="submit" id="connexion" name="connexion">Se Connecter</button>
                 </div>
-                <div class="element">
-                    <button class="formbutton" type="submit" id="mdpoublie" name="mdpoublie">Mot de passe oublié ?</button>
-                </div>
+                <?php
+                if ($role==0) {  // le bouton mdp oublié n'est présenté que lorsqu'on n'est pas connecté.
+                    ?>
+                    <div class="element">
+                         <button class="formbutton" type="submit" id="mdpoublie" name="mdpoublie">Mot de passe oublié ?</button>
+                    </div>
+
+                    <?php
+                }
+                ?>
             </form>  
            <div class="element">
                 <a href="creationcompte.php">pas encore de compte ?</a>

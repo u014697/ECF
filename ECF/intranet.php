@@ -9,7 +9,10 @@ require "head.php";
 
     <?php
        require "header.php";
-       if ($role!=2) header ("location:login.php");
+       if ($role!=2) {
+        $_SESSION["requested_uri"]="intranet.php";
+        header ("location:login.php");
+       }
     ?>
     
     <?php

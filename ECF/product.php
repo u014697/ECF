@@ -14,11 +14,17 @@ require "head.php";
     <?php
         $message="";    
         if(isset($_POST["addtocart"])) {
-            if (addtocart($_POST["id"],$_POST["quantite"],$_POST["prix"])){
-                $message="Produit ajouté au panier avec succes !";            
+            if ($_POST["quantite"]<1000) {
+                $message = "erreur : vous devez commander au moins 1000 produits";
             }
             else {
-                $message="echec d'ajout du produit dans le panier !";                          
+                if (addtocart($_POST["id"],$_POST["quantite"],$_POST["prix"])){
+                    $message="Produit ajouté au panier avec succes !";            
+                }
+                else {
+                    $message="echec d'ajout du produit dans le panier !";                          
+                }
+    
             }
         }
         if (isset($_GET["article"])&&is_numeric($_GET["article"])) {
@@ -61,7 +67,7 @@ require "head.php";
                                     <label for="quantite">Quantité : </label>
                                     <input  type="hidden"  id="id" name="id" value="<?php echo $article["idProduct"] ?>"/>
                                     <input  type="hidden"  id="prix" name="prix" value="<?php echo $article["price"] ?>"/>
-                                    <input  style="min-width:6rem" type="number"  id="quantite" name="quantite" placeholder="1000" required/>
+                                    <input  style="min-width:6rem" type="number"  id="quantite" name="quantite" placeholder="1000 minimum" required/>
                                 </div>
 
                                 <div class="element">

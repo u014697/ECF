@@ -9,7 +9,10 @@ require "head.php";
 
     <?php
        require "header.php";
-       if ($role!=1) header ("location:login.php");
+       if ($role!=1) {
+        $_SESSION["requested_uri"]="panier.php";
+        header ("location:login.php");
+       }
     ?>
     
     <?php

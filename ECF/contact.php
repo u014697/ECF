@@ -16,7 +16,7 @@ require "head.php";
         if (isset ($_POST["envoyer"])) {
             $to      = CONTACT_EMAIL;
             $objet = $_POST["objet"];
-            $message = "dossier suivi par ".$_POST["contact"]."<br>".$_POST["message"];
+            $message = "de la part de ".$_POST["contact"]."de la société ".$_POST["company"]."<br>".$_POST["message"];
      //   mail($to, $objet, $message);
             $message ="le message a été envoyé";
         }
@@ -39,8 +39,12 @@ require "head.php";
                     </p>
                 </div>
                 <div class="element">
-                    <label for="objet">votre contact : </label>
+                    <label for="contact">votre nom : </label>
                     <input  type="text" size="50" id="contact" name="contact" placeholder="prénom nom" required/>
+                </div>
+                <div class="element">
+                    <label for="company">votre société : </label>
+                    <input  type="text" size="50" id="company" name="company" placeholder="votre société" required/>
                 </div>
                 <div class="element">
                     <label for="objet">Objet    : </label>

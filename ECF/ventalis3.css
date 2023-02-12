@@ -4,6 +4,8 @@ body {
     background-repeat:no-repeat;
     background-position:center center;
     background-size: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
 }
 
 h2 {
@@ -54,7 +56,7 @@ button {
     border-radius: 0.5rem;
 }
 button:hover {
-    background-color: #7C7C84; 
+    background-color: #7C7C7C; 
     color:black;
 }
 
