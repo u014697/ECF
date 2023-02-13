@@ -61,7 +61,7 @@ button:hover {
 }
 
 .formbutton {
-    position : absolute;
+    position : relative;
     left:50%;
     margin-top: 1rem;
 }
@@ -95,13 +95,9 @@ footer {
 }
 
 .container {
-    width:100%;
-    height:95%;
     display: flex;
-    align-items: center;
-    justify-content: space-around;
-    flex-direction: row;
-    flex-wrap:nowrap;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
 }
 
 .console {
@@ -114,81 +110,22 @@ footer {
     top:7%;
 }
 .formulaire{
-    width: auto;
-    height: auto;  
-    position: absolute;  
-    left: 50%; 
-    top: 50%;
-    transform: translate(-50%, -50%);
+    min-width:25%;
+    max-width:50%;
+    display: inline-block;
     background-color : white;
     border : 1px black solid;
     border-radius : 1rem;
     padding : 1rem;
+    margin-top:3rem;
+    margin-left:1rem;
+    margin-right:1rem;
 }
-
-.formulairegauche{
-    width:40%;
-    height: auto;  
-    position: absolute;  
-    left: 25%; 
-    top: 50%;
-    transform: translate(-50%, -50%);
-    background-color : white;
-    border : 1px black solid;
-    border-radius : 1rem;
-    padding : 1rem;
-}
-
-.formulairedroite{
-    width: 40%;
-    height: auto;  
-    position: absolute;  
-    left: 75%; 
-    top: 50%;
-    transform: translate(-50%, -50%);
-    background-color : white;
-    border : 1px black solid;
-    border-radius : 1rem;
-    padding : 1rem;
-}
-
-.formulaire1sur3 {
-    width:25%;
-    height: auto;  
-    position: absolute;  
-    left: 15%; 
-    top: 50%;
-    transform: translate(-50%, -50%);
-    background-color : white;
-    border : 1px black solid;
-    border-radius : 1rem;
-    padding : 1rem;
-}
-
-.formulaire2sur3 {
-    width:25%;
-    height: auto;  
-    position: absolute;  
-    left: 50%; 
-    top: 50%;
-    transform: translate(-50%, -50%);
-    background-color : white;
-    border : 1px black solid;
-    border-radius : 1rem;
-    padding : 1rem;
-}
-
-.formulaire3sur3 {
-    width:25%;
-    height: auto;  
-    position: absolute;  
-    left: 85%; 
-    top: 50%;
-    transform: translate(-50%, -50%);
-    background-color : white;
-    border : 1px black solid;
-    border-radius : 1rem;
-    padding : 1rem;
+@media all and (orientation: portrait) {
+    .formulaire {
+        max-width:95%;
+        width:95%;
+    }
 }
 
 .formul {
@@ -207,7 +144,7 @@ label {
 
 input {
     border-radius: 1rem;
-    min-width:15rem;
+    width:50%;
 }
 
 .radio {
@@ -216,7 +153,7 @@ input {
 
 textarea {
     border-radius: 1rem;
-    min-width:15rem;
+    width:90%;
 }
 
 td {

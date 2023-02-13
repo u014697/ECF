@@ -19,7 +19,7 @@ require "head.php";
         $message="";
         if (isset ($_POST["creercategorie"])) {
             if (!createcategorie($_POST["categorie"])) {
-            $message="<br><br>echec de création de la catégorie";
+            $message="echec de création de la catégorie";
             }
         }
         elseif (isset ($_POST["creerproduit"])) {
@@ -28,11 +28,11 @@ require "head.php";
                 $nomdestination = 'image/'.$_FILES["imageproduit"]["name"];
 
                 if (createProduct ($_POST["nomproduit"],$_POST["categorieproduit"],$nomdestination,$_POST["descriptionproduit"],$_POST["prixproduit"])) {
-                    $message="<br><br>Création effectuée";
+                    $message="Création effectuée";
                     move_uploaded_file($nom, $nomdestination);
                 }
                 else {
-                    $message="La création a échouée";
+                    $message="La création a échoué";
                 }   
             }
             else {
@@ -51,10 +51,10 @@ require "head.php";
     
     ?>
     <main>
-    <div>
     <?php require "console.php" ?>
+    <div class="container">
 
-    <div class="formulaire1sur3">
+    <div class="formulaire">
         <h2>Créer une catégorie</h2>
         <form  method="post">
                 <div class="element">
@@ -66,7 +66,7 @@ require "head.php";
                 </div>
             </form>  
     </div>
-    <div class="formulaire2sur3">
+    <div class="formulaire">
         <h2>Ajouter un produit</h2>
         <form  method="post" enctype="multipart/form-data">
                 <input type="hidden" name="MAX_FILE_SIZE" value="1000000">
@@ -100,34 +100,39 @@ require "head.php";
                 </div>
             </form>  
     </div>
-    <div class="formulaire3sur3">
+    <div class="formulaire">
         <h2>Mes clients </h2>
         <?php
             $result=getclients();
         ?>
 
             <form  method="post">
-                <div class="element">
-                <?php
+                <table>
+                    <tr>
+                        <th> client</th>
+                        <th> messages </th>
+                        <th> commandes </th>
+                    </tr>
+                    <?php
                     $first=true;
                     foreach ($result as $client) {
-                         echo '<label><input  type="radio" style="min-width:1rem" id="u'.$client["idUser"].'" value="'.$client["idUser"].'" name="radio"';
-                        if ($first) {
-                         echo " checked ";
-                        $first=false;
-                        }
-                        echo ' />';
-                        echo $client["firstName"].' '.$client["name"].' ('.$client["email"].')</label>';
+                        echo '<tr>';                       
+                        echo '<td>'.$client["firstName"].' '.$client["name"].' ('.$client["email"].') </td>';
+                        echo '<td><a href="viewmessage.php?fromuser='.$client["idUser"].'">'.getmessagecount($client["idUser"]).'</a></td>';
+                        echo '<td><a href="vieworder.php?fromuser='.$client["idUser"].'">'.getordercount($client["idUser"]).'</a></td>';
+                        echo '</tr>';
                     } 
                 ?> 
+                </table>
+                <div class="element">
                 </div>
                 <div class="element">
                     <label for="objet">Objet    : </label>
-                    <input  type="text" size="50" id="objet" name="objet" placeholder="objet" required/>
+                    <input  type="text"  id="objet" name="objet" placeholder="objet" required/>
                 </div>
                 <div>
                     <label for="message">Message :</label>
-                    <textarea  rows="5" cols="50" id="message"  name="message" placeholder="votre message" required></textarea>
+                    <textarea  rows="5"  id="message"  name="message" placeholder="votre message" required></textarea>
                 </div>
                 <div class="element">
                     <button class="formbutton" type="submit" id="envoyer" name="envoyer">Envoyer un message</button>

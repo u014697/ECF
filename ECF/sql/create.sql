@@ -25,14 +25,14 @@ CREATE TABLE products (
     description TEXT NOT NULL,
     price DECIMAL(12,2) NOT NULL,
     stock int(11) NOT NULL,
-    FOREIGN KEY (categorie) REFERENCES Categories(categorie)
+    FOREIGN KEY (categorie) REFERENCES categories(categorie)
 );
 
 CREATE TABLE orders (
     idOrder INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     idUser INT(11) NOT NULL,
     state INT(11) NOT NULL,
-    FOREIGN KEY (idUser) REFERENCES Users(idUser)
+    FOREIGN KEY (idUser) REFERENCES users(idUser)
 );
 
 CREATE TABLE cartelements (
@@ -41,13 +41,23 @@ CREATE TABLE cartelements (
     volume INT(11) NOT NULL,
     price DECIMAL(12,2) NOT NULL,
     idOrder int(11) NOT NULL,
-    FOREIGN KEY (idProduct) REFERENCES Products(idProduct),
-    FOREIGN KEY (idOrder) REFERENCES Orders(idOrder) 
+    FOREIGN KEY (idProduct) REFERENCES products(idProduct),
+    FOREIGN KEY (idOrder) REFERENCES orders(idOrder) 
 );
 
 CREATE TABLE comments (
     idComment INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     idOrder INT(11) NOT NULL,
     comment TEXT NOT NULL,
-    FOREIGN KEY (idOrder) REFERENCES Orders(idOrder)
+    FOREIGN KEY (idOrder) REFERENCES orders(idOrder)
+);
+
+CREATE TABLE messages (
+    idMessage INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    idFrom INT(11) NOT NULL,
+    idTo INT(11) NOT NULL,
+    objet VARCHAR(100) NOT NULL,
+    message TEXT NOT NULL,
+    FOREIGN KEY (idFrom) REFERENCES users(idUser),
+    FOREIGN KEY (idTo) REFERENCES users(idUser)
 );

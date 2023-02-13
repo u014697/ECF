@@ -198,6 +198,9 @@ function modifmdp ($email,$pass,$tobechanged) {
         return false;
     }
 }
+
+// envoi d'un message d'un client vers son conseillé ventalis
+
 function sendmessage ($objet,$message) {
     global $pdo;
 
@@ -208,23 +211,89 @@ function sendmessage ($objet,$message) {
         $client = getUser();
         if (!$client) return false;
 
-        // ensuite, on retrouve les coordonnées de son conseillé
-        $checkuser = $pdo->prepare('SELECT email FROM users WHERE idcontact=:idcontact');  //on récupère le conseillé du client
-        $checkuser->bindValue(':idcontact', $client["idcontact"], PDO::PARAM_STR);
-        $checkuser->execute();
-        $vendor= $checkuser->fetch(PDO::FETCH_ASSOC);
-        if (!$vendor) return false;
+        // ensuite, on crée le message dans la table messages
 
-        //enfin, on envoi le mail
-
-        $to      = $vendor["email"];
-        $message = 'Votre nouveau mot de passe est '.NEW_PASSWORD;
-        $headers = 'From: '.$client["email"];
- //   mail($to, $objet, $message, $headers);
-        return true;
+        $createmes = $pdo->prepare('INSERT INTO messages(idFrom,idTo,objet,message) VALUES (:from, :to, :objet, :message) ');   
+        $createmes->bindValue(':from', $client["idUser"], PDO::PARAM_STR);
+        $createmes->bindValue(':to', $client["idContact"], PDO::PARAM_STR);
+        $createmes->bindValue(':objet', htmlspecialchars($objet), PDO::PARAM_STR);
+        $createmes->bindValue(':message', htmlspecialchars($message), PDO::PARAM_STR);
+        
+        return $createmes->execute();
     }
     catch (PDOException $e) {
-        echo"Échec de l'envoi'";
+        echo $e->getMessage();
+
+        return false;
+    }
+  }
+
+// lecture des messages recus
+
+function getmessage () {
+    global $pdo;
+
+        if (!isset ($_SESSION["token"])) return false;
+    
+    try {
+        // on commence par retrouver l'identité de l'emetteur du message (le client)
+        $client = getUser();
+        if (!$client) return false;
+
+        // ensuite, on lit les  message dans la table messages
+
+        $getmes = $pdo->prepare('SELECT * FROM messages WHERE idTo= :to ');   
+        $getmes->bindValue(':to', $client["idContact"], PDO::PARAM_STR);
+        $getmes->execute();
+        return $getmes->fetchAll(PDO::FETCH_ASSOC);
+    }
+    catch (PDOException $e) {
+        echo $e->getMessage();
+
+        return false;
+    }
+  }
+
+  function getmessagefrom ($id) {
+    global $pdo;
+
+        if (!isset ($_SESSION["token"])) return false;
+    
+    try {
+        // on commence par retrouver l'identité du destinaitaire (l'utilisateur connecté)
+        $client = getUser();
+        if (!$client) return false;
+
+        // ensuite, on lit les  messages dans la table messages
+
+        $getmes = $pdo->prepare('SELECT * FROM messages WHERE idTo= :to AND idFrom= :from');   
+        $getmes->bindValue(':to', $client["idUser"], PDO::PARAM_STR);
+        $getmes->bindValue(':from', $id, PDO::PARAM_STR);
+        $getmes->execute();
+        return $getmes->fetchAll(PDO::FETCH_ASSOC);
+    }
+    catch (PDOException $e) {
+        echo $e->getMessage();
+
+        return false;
+    }
+  }
+
+  function getorderfrom ($id) {
+    global $pdo;
+
+        if (!isset ($_SESSION["token"])) return false;
+    
+    try {
+ 
+        $getmes = $pdo->prepare('SELECT * FROM orders WHERE idUser= :iduser AND state= 1');   
+        $getmes->bindValue(':iduser', $id, PDO::PARAM_STR);
+        $getmes->execute();
+        return $getmes->fetchAll(PDO::FETCH_ASSOC);
+    }
+    catch (PDOException $e) {
+        echo $e->getMessage();
+
         return false;
     }
   }
@@ -240,20 +309,46 @@ function sendmessage ($objet,$message) {
         $employe= getUser();
         if (!$employe) return false;
 
-        // ensuite, on retrouve les coordonnées du client
-        $checkuser = $pdo->prepare('SELECT email FROM users WHERE idUser=:iduser');  //on récupère le conseillé du client
-        $checkuser->bindValue(':iduser', $client, PDO::PARAM_INT);
-        $checkuser->execute();
-        $user= $checkuser->fetch(PDO::FETCH_ASSOC);
-        if (!$user) return false;
-        $to      = $user["email"];
-        $headers = 'From: '.$employe["email"];
- //   mail($to, $objet, $message, $headers);
+        // ensuite, on enregistre le message
+        $mess = $pdo->prepare('INSERT INTO messages (idFrom,idTo,objet,message) VALUES (:idfrom,:idto,:objet,:message)');  
+        $mess->bindValue(':idfrom', $employe["idUser"], PDO::PARAM_INT);
+        $mess->bindValue(':idto', $client, PDO::PARAM_INT);
+        $mess->bindValue(':objet', htmlspecialchars($objet), PDO::PARAM_STR);
+        $mess->bindValue(':message', htmlspecialchars($message), PDO::PARAM_STR);
+        $mess->execute();
         return true;
-
         }
         catch (PDOException $e) {
-            echo"Échec de l'envoi'";
+            echo $e->getMessage();
+
+            return false;
+        }
+  }
+
+  // validation  d'une commande par l'employé
+
+  function processorder ($idorder,$comment) {
+    global $pdo;
+
+        if (!isset ($_SESSION["token"])) return false;
+    
+        try {
+
+       // on passe la commande au statut validé (state=2)
+        $val = $pdo->prepare('UPDATE orders SET state=2 WHERE idOrder=:idorder');
+        $val->bindValue(':idorder', $idorder, PDO::PARAM_INT);
+        $val->execute();
+
+        // ensuite, on enregistre le commentaire
+        $mess = $pdo->prepare('INSERT INTO comments (idOrder,comment) VALUES (:idorder,:comment)');  
+        $mess->bindValue(':idorder', $idorder, PDO::PARAM_INT);
+        $mess->bindValue(':comment', htmlspecialchars($comment), PDO::PARAM_STR);
+        $mess->execute();
+        return true;
+        }
+        catch (PDOException $e) {
+            echo $e->getMessage();
+
             return false;
         }
   }
@@ -293,6 +388,7 @@ function sendmessage ($objet,$message) {
             return true;   
         }
         catch (PDOException $e) {
+            echo $e->getMessage();
             return false;
         }    
   }
@@ -398,6 +494,47 @@ function sendmessage ($objet,$message) {
         }    
   }
 
+  // donne toutes les commandes créée d'un client 
+  function getorders ($iduser) {
+    global $pdo;
+
+        if (!isset ($_SESSION["token"])) return false;
+ 
+        try {
+
+            //enfin on lit les cart elements correspondants aux commandes crées par l'utilisateur en pramétre, eton y adjoint le nom des produits
+
+            $atc = $pdo->prepare('SELECT orders.idOrder,cartelements.idCartElement,cartelements.idProduct,cartelements.idProduct,cartelements.volume,cartelements.price,cartelements.idOrder,products.label FROM orders
+                                        JOIN cartelements ON cartelements.idOrder=orders.idOrder
+                                        JOIN products ON products.idProduct=cartelements.idProduct
+                                        WHERE orders.idUser=:iduser and orders.state=1');   
+            $atc->bindValue(':iduser', $iduser, PDO::PARAM_STR);
+            $atc->execute();   
+            return $atc->fetchAll(PDO::FETCH_ASSOC);
+        }
+        catch (PDOException $e) {
+            echo $e->getMessage();
+            return false;
+        }    
+  }
+
+  function getorder ($idorder) {
+    global $pdo;
+
+        if (!isset ($_SESSION["token"])) return false;
+ 
+        try {
+            $atc = $pdo->prepare('SELECT * FROM orders WHERE idOrder=:order');   
+            $atc->bindValue(':order', $idorder, PDO::PARAM_STR);
+            $atc->execute();   
+            return $atc->fetch(PDO::FETCH_ASSOC);
+        }
+        catch (PDOException $e) {
+            echo $e->getMessage();
+            return false;
+        }    
+  }
+
   function erasecartelement ($idelement) {
     global $pdo;
 
@@ -492,6 +629,8 @@ function getdetailproduct($id) {
         return false;
     }    
 }
+
+//  retourne tous les client de l'employé connecté
 function getclients() {
     global $pdo;
 
@@ -507,8 +646,64 @@ function getclients() {
     catch (PDOException $e) {
         return null;
     }    
+}
+
+//  retourne les détails d'un utilisateur
+
+function getclient($id) {
+    global $pdo;
+
+    try {
+        $getclient= $pdo->prepare('SELECT * FROM users WHERE idUser=:id');   
+        $getclient->bindValue(':id', $id, PDO::PARAM_STR);
+        $getclient->execute();
+        return $getclient->fetch(PDO::FETCH_ASSOC);
+    }
+    catch (PDOException $e) {
+        return false;
+    }    
+}
+
+function getmessagecount($from) {
+    global $pdo;
+
+    try {
+        // on commence par retrouver l'identité du proprétaire de la boited e réception
+        $to= getUser();
+        //ensuite on récupere le nombre de message recu
+        $getmes= $pdo->prepare('SELECT COUNT(idMessage) AS C FROM messages WHERE idTo=:to AND idFrom=:from');   
+        $getmes->bindValue(':to', $to["idUser"], PDO::PARAM_STR);
+        $getmes->bindValue(':from', $from, PDO::PARAM_STR);
+        $getmes->execute();
+        $res = $getmes->fetch(PDO::FETCH_ASSOC);
+        return $res["C"];
+    }
+    catch (PDOException $e) {
+
+        return 0;
+    }    
 
 }
+
+//recupere les commandes crée par un utilisateur (etat=1)
+function getordercount($user) {
+    global $pdo;
+
+    try {
+        $getord= $pdo->prepare('SELECT COUNT(idOrder) AS C FROM orders WHERE state=1 AND idUser=:user');   
+        $getord->bindValue(':user', $user, PDO::PARAM_STR);
+        $getord->execute();
+        $res = $getord->fetch(PDO::FETCH_ASSOC);
+        return $res["C"];
+    }
+    catch (PDOException $e) {
+
+        return 0;
+    }    
+
+}
+
+
 
 function cancelUser () {
     /* the token will be used to know which account is to be deleted */

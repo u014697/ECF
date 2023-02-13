@@ -15,8 +15,8 @@ require "head.php";
         $message="";    
     ?>
     <main>
-    <div>
     <?php require "console.php" ?>
+    <div class="container">
 
     <div class="formulaire">
         <h2>Catalogue</h2>
@@ -41,6 +41,10 @@ require "head.php";
                         }?>
                     </select>
                 </div>
+                <div class="element">
+                    <button class="formbutton" type="submit" id="actualiser" name="Actualiser">Actualiser</button>
+                </div>
+
                 <div>
                     <?php
                         if (isset($_POST["categorieproduit"])) {
@@ -65,9 +69,6 @@ require "head.php";
                         }
                         ?>
                         </table>
-                </div>
-                <div class="element">
-                    <button class="formbutton" type="submit" id="actualiser" name="Actualiser">Actualiser</button>
                 </div>
             </form>  
     </div>

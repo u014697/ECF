@@ -36,7 +36,7 @@ require "head.php";
     ?>
     <main>
     <?php require "console.php" ?>
-
+    <div class="container">
     <div class="formulaire">
         <h2>Détail produit</h2>
         <table>
@@ -91,6 +91,7 @@ require "head.php";
                     <button class="right" type="submit" id="retour" name="retour">Retour à la liste</button>
                 </div>
         </form>  
+    </div>
     </div>
     <?php
         require "footer.php";

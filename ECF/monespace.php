@@ -18,25 +18,20 @@ require "head.php";
     <?php
         $message="";
         if (isset ($_POST["envoyer"])) {
-            if (!sendmessage($_POST["objet"],$_POST["message"])) {
-            $message="echec de l'envoi du message";
+            if (sendmessage($_POST["objet"],$_POST["message"])) {
+            $message="message envoyé";
             }
-        }
-        elseif (isset ($_POST["creer"])) {
-            if (createUser ($_POST["email"],$_POST["password"],$_POST["nom"],$_POST["prenom"],"Ventalis",2)) {
-                $message="modification effectuée";
-            }
-        else {
-            $message="echec de modification";
+            else {
+            $message="echec de l'envoi de message";
             }
         }
     ?>
     <main>
-    <div>
     <?php require "console.php" ?>
 
+    <div class="container">
 
-    <div class="formulairegauche">
+    <div class="formulaire">
         <h2>mes commandes</h2>
         <?php
             $result=getcommande();
@@ -53,7 +48,18 @@ require "head.php";
             foreach ($result as $commande) {
                 echo "<tr>";
                 echo "<td>".$commande["idorder"]."</td>";
-                echo "<td>".$commande["state"]."</td>";
+                if ($commande["state"]==0){
+                    echo "<td>panier</td>";
+                }
+                elseif ($commande["state"]==1){
+                    echo "<td>crée</td>";
+                }
+                elseif ($commande["state"]==2){
+                    echo "<td>validée</td>";
+                }
+                else {
+                    echo "<td>inconnu</td>";
+                }
                 echo "<td>".$commande["label"]."</td>";
                 echo "<td>".$commande["price"]."</td>";
                 echo "<td>".$commande["volume"]."</td>";
@@ -62,7 +68,7 @@ require "head.php";
             ?> 
         </table>
     </div>
-    <div class="formulairedroite">
+    <div class="formulaire">
         <h2>Contacter mon conseillé </h2>
             <form  method="post">
                 <div class="element">

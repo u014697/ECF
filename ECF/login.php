@@ -13,8 +13,10 @@ if (isset ($_POST["connexion"])) {             // l'utilisateur vient d'entrer s
                 modifmdp ($_POST["email"],$_POST["npassword"],0);
                 setlogin($_POST["email"]);
                 if (isset($_SESSION["requested_uri"])) {
-                    header ("location:".$_SESSION["requested_uri"]); 
-                }
+                    $destination=$_SESSION["requested_uri"];
+                    unset($_SESSION["requested_uri"]);
+                    header ("location:".$destination); 
+                    }
                 else {
                     header ("location:acceuil.php"); 
                 }
@@ -27,7 +29,9 @@ if (isset ($_POST["connexion"])) {             // l'utilisateur vient d'entrer s
          }
         else {
             if (isset($_SESSION["requested_uri"])) {
-                header ("location:".$_SESSION["requested_uri"]); 
+                $destination=$_SESSION["requested_uri"];
+                unset($_SESSION["requested_uri"]);
+                header ("location:".$destination); 
             }
             else {
                 header ("location:acceuil.php"); 
@@ -58,7 +62,7 @@ elseif (isset ($_POST["mdpoublie"])) {
     <?php require "console.php" ?>
 
     <main>
-
+    <div class="container">
     <div class="formulaire">
             <form  method="post">
                 <div class="element">
@@ -98,6 +102,7 @@ elseif (isset ($_POST["mdpoublie"])) {
            <div class="element">
                 <a href="creationcompte.php">pas encore de compte ?</a>
            </div>
+    </div>
     </div>
 
     <?php

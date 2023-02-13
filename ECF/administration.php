@@ -35,10 +35,10 @@ require "head.php";
         }
     ?>
     <main>
-    <div>
     <?php require "console.php" ?>
+    <div class="container">
 
-    <div class="formulairegauche">
+    <div class="formulaire">
         <h2>Reinitialisation MDP</h2>
             <form  method="post">
                 <div class="element">
@@ -55,7 +55,7 @@ require "head.php";
                 </div>
             </form>  
     </div>
-    <div class="formulairedroite">
+    <div class="formulaire">
         <h2>Création d'un employé</h2>
             <form  method="post">
                 <div class="element">
