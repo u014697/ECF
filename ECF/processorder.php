@@ -45,14 +45,13 @@ require "head.php";
         $idorder=0;
     }
     $order=getorder($idorder);
-echo var_dump($order);
     $client=getclient($order["idUser"]);
     if (!$client) {$message="ce client n'existe pas";}
      require "console.php";
      if (!$client) {exit();}?>
 
     ?>
-    <div class="container">
+    <div class="contain">
 
     <div class="formulaire">
 

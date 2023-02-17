@@ -62,7 +62,7 @@ elseif (isset ($_POST["mdpoublie"])) {
     <?php require "console.php" ?>
 
     <main>
-    <div class="container">
+    <div class="contain">
     <div class="formulaire">
             <form  method="post">
                 <div class="element">

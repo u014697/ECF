@@ -44,7 +44,7 @@ require "head.php";
      if (!$client) {exit();}?>
 
     ?>
-    <div class="container">
+    <div class="contain">
 
     <div class="formulaire">
 

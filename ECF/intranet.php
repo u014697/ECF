@@ -52,14 +52,14 @@ require "head.php";
     ?>
     <main>
     <?php require "console.php" ?>
-    <div class="container">
+    <div class="contain">
 
     <div class="formulaire">
         <h2>Créer une catégorie</h2>
         <form  method="post">
                 <div class="element">
                     <label for="categorie">nouvelle catégorie : </label>
-                    <input  type="text" size="25" id="categorie" name="categorie" placeholder="nouvelle catégorie" required/>
+                    <input  type="text" id="categorie" name="categorie" placeholder="nouvelle catégorie" required/>
                 </div>
                 <div class="element">
                     <button class="formbutton" type="submit" id="creercategorie" name="creercategorie">Créer</button>

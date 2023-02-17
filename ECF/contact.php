@@ -23,8 +23,8 @@ require "head.php";
     
     ?>
     <main>
-    <div class="container">
     <?php require "console.php" ?>
+    <div class="contain">
 
     <div class="formulaire">
         <h2>Contact </h2>

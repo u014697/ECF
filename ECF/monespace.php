@@ -29,7 +29,7 @@ require "head.php";
     <main>
     <?php require "console.php" ?>
 
-    <div class="container">
+    <div class="contain">
 
     <div class="formulaire">
         <h2>mes commandes</h2>

@@ -20,7 +20,7 @@ if (isset ($_POST["inscrire"])) {
 
     <main>
 
-    <div class="container">
+    <div class="contain">
     <div class="formulaire">
             <form  method="post">
                 <div class="element">
