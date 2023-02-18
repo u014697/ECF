@@ -68,10 +68,13 @@ require "head.php";
                     prix HT (pour 1000 unités) :
                     <?php echo $article["price"] ?>
                 </div>
-                    <img src="<?php echo $article["picture"] ?>" width="200px">
+                <div style="width:100%">
+                    <img class="centered" src="<?php echo $article["picture"] ?>" width="200px">
+                 </div>
                     <?php    
                         echo "<div>".$article["description"]."</div>";
                     ?>
+                <div>
                     <form  method="post" action="catalogue.php">
                         <div class="element">
                             <button class="right" type="submit" id="retour" name="retour">Retour à la liste</button>

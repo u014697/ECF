@@ -116,11 +116,23 @@ require "head.php";
                     <?php
                     $first=true;
                     foreach ($result as $client) {
+                        $mescount=getmessagecount($client["idUser"]);
+                        $ordcount=getordercount($client["idUser"]);
                         echo '<tr>';                       
                         echo '<td>'.$client["firstName"].' '.$client["name"].' ('.$client["email"].') </td>';
-                        echo '<td><a href="viewmessage.php?fromuser='.$client["idUser"].'">'.getmessagecount($client["idUser"]).'</a></td>';
-                        echo '<td><a href="vieworder.php?fromuser='.$client["idUser"].'">'.getordercount($client["idUser"]).'</a></td>';
-                        echo '</tr>';
+                        if ($mescount>0) {
+                            echo '<td><a href="viewmessage.php?fromuser='.$client["idUser"].'">'.$mescount.'</a></td>';
+                        }
+                        else {
+                            echo '<td>'.$mescount.'</td>';
+                        }
+                        if ($ordcount>0){
+                            echo '<td><a href="vieworder.php?fromuser='.$client["idUser"].'">'.$ordcount.'</a></td>';
+                        }
+                        else {
+                            echo '<td>'.$ordcount.'</td>';
+                        }
+                       echo '</tr>';
                     } 
                 ?> 
                 </table>
@@ -139,9 +151,8 @@ require "head.php";
                 </div>
             </form>  
     </div>
-
-
     </div>
+    </main>
     <?php
         require "footer.php";
     ?>

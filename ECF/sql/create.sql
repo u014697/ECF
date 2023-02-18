@@ -9,7 +9,8 @@ CREATE TABLE users (
     registrationNumber INT(11),
     hashPass VARCHAR(100) NOT NULL,
     hashToken VARCHAR(100) ,
-    expirationToken DATETIME ,
+    expirationToken INT(11) NOT NULL ,
+    tobechanged int(11) NOT NULL DEFAULT 0,
     role int(11) NOT NULL
 );
 
@@ -32,6 +33,7 @@ CREATE TABLE orders (
     idOrder INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     idUser INT(11) NOT NULL,
     state INT(11) NOT NULL,
+    time INT(11) NOT NULL DEFAULT 0,
     FOREIGN KEY (idUser) REFERENCES users(idUser)
 );
 
@@ -49,6 +51,7 @@ CREATE TABLE comments (
     idComment INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     idOrder INT(11) NOT NULL,
     comment TEXT NOT NULL,
+    time INT(11) NOT NULL DEFAULT 0,
     FOREIGN KEY (idOrder) REFERENCES orders(idOrder)
 );
 
@@ -58,6 +61,8 @@ CREATE TABLE messages (
     idTo INT(11) NOT NULL,
     objet VARCHAR(100) NOT NULL,
     message TEXT NOT NULL,
+    time INT(11) NOT NULL,
+    state INT(11) NOT NULL DEFAULT 0,
     FOREIGN KEY (idFrom) REFERENCES users(idUser),
     FOREIGN KEY (idTo) REFERENCES users(idUser)
 );

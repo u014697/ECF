@@ -64,7 +64,8 @@ require "head.php";
                             }
                             $first=false;
                             echo "<br>commande référence <a href='processorder.php?order=".$current."'>No :".$current."</a>";
-                            echo "<table><tr><th>article</th><th>prix</th><th>quantité</th><th></th></tr>";
+                            echo '<br>date : '.date ("d m Y h:i:s",$order["time"]).'<br>';                       
+                            echo "<table class='centered'><tr><th>article</th><th>prix</th><th>quantité</th><th></th></tr>";
                         }
                         echo '<tr>';
                         echo '<td style="width:75%">'.$order["label"].'</td>';                       

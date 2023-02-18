@@ -1,3 +1,3 @@
 <?php
-echo "hello word !";
+ header ("location:acceuil.php");
 ?>

@@ -55,7 +55,7 @@ require "head.php";
                         }
                         $result=getproducts($filtre);
                         ?>
-                        <table class="centered">
+                        <table class="centered" style="table-layout:auto;width:100%">
                             <tr>
                                 <th>produit</th>
                                 <th>prix</th>
@@ -72,9 +72,8 @@ require "head.php";
                 </div>
             </form>  
     </div>
-
-
     </div>
+    </main>
     <?php
         require "footer.php";
     ?>

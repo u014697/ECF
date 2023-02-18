@@ -40,23 +40,20 @@ require "head.php";
     $client=getclient($idclient);
     if (!$client) {$message="ce client n'existe pas";}
      require "console.php";
-     if (!$client) {exit();}?>
+     if (!$client) {exit();}
 
     ?>
     <div class="contain">
-
     <div class="formulaire">
-
         <h2>Recu de <?php echo $client["firstName"]." ".$client["name"] ?></h2>
-
-            <?php $result=getmessagefrom($client["idUser"]); ?>
-
-            <?php
-                    foreach ($result as $message) {
-                        echo 'objet : '.$message["objet"].'<br>';                       
-                        echo 'message : '.$message["message"].'<br><br>';                       
-                    } 
-                ?> 
+            <?php 
+                $result=getmessagefrom($client["idUser"]);
+                foreach ($result as $message) {
+                    echo 'objet : '.$message["objet"].'<br>';                       
+                    echo 'envoyé le : '.date ("d m Y h:i:s",$message["time"]).'<br>';                       
+                    echo 'message : '.$message["message"].'<br><br>';                       
+                } 
+            ?> 
             <h3> Répondre à <?php echo $client["firstName"]." ".$client["name"] ?></h3>
             <form  method="post">
                 <div class="element">
@@ -74,9 +71,8 @@ require "head.php";
                 </div>
             </form>  
     </div>
-
-
     </div>
+    </main>
     <?php
         require "footer.php";
     ?>

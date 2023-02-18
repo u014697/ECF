@@ -59,9 +59,8 @@ require "head.php";
                 </div>
             </form>  
     </div>
-
-
     </div>
+    </main>
     <?php
         require "footer.php";
     ?>

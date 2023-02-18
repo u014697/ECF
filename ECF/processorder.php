@@ -50,13 +50,28 @@ require "head.php";
      require "console.php";
      if (!$client) {exit();}?>
 
-    ?>
     <div class="contain">
-
     <div class="formulaire">
-
         <h2>Traiter la commande ref:<?php echo $idorder; ?></h2>
-
+            <?php
+                            $sum=0;
+                            $result=getoneorder($idorder); 
+                            echo 'émise le : '.date ("d m Y h:i:s",$result[0]["time"]).'<br>';                       
+                            echo "<table style='table-layout=auto;width=100%'><tr><th></th><th>article</th><th>prix</th><th>quantité</th><th>prix total</th></tr>";
+                            foreach ($result as $order) {
+                                echo '<tr>';
+                                echo '<td><img src="'.$order["picture"].'" style="width:100px"></td>';
+                                echo '<td>'.$order["label"].'</td>';                       
+                                echo '<td>'.$order["price"].'</td>';                       
+                                echo '<td>'.$order["volume"].'</td>'; 
+                                echo '<td>'.$order["volume"]*$order["price"].'</td>';
+                                echo '</tr>';
+                                $sum+=$order["volume"]*$order["price"];
+                            }
+                            echo "</table>";
+                            echo "<p>Montant global de la commande : ".$sum." € HT</p>";
+             
+            ?>
             <form  method="post">
                 <div>
                     <label for="message">commentaire :</label>
@@ -69,9 +84,7 @@ require "head.php";
                 </div>
             </form>  
     </div>
-
     <div class="formulaire">
-
         <h2>Contacter <?php echo $client["firstName"]." ".$client["name"] ?></h2>
 
             <form  method="post">
@@ -90,9 +103,8 @@ require "head.php";
                 </div>
             </form>  
     </div>
-
-
     </div>
+    </main>
     <?php
         require "footer.php";
     ?>

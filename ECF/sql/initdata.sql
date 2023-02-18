@@ -1,23 +1,4 @@
--- creation d'un admin (role=3)
--- le hash 'provisoire' entrainera une pricédure de choix d'un mdp par l'utilisateur a sa première tentative de connection
-
-INSERT INTO Users (name,firstName,company,email,registrationNumber,hashpass,role)
-        VALUES ('Bigboss','The',  'Ventalis', 'thebigboss@ventalis.com',1001,'provisoire',3);
-
--- creation des employés (role=2)
-
-INSERT INTO Users (name,firstName,company,email,registrationNumber,hashpass,role)
-        VALUES ('Ventalis','John',  'Ventalis', 'johnventalis@ventalis.com',1002,'provisoire',2);
-INSERT INTO Users (name,firstName,company,email,registrationNumber,hashpass,role)
-        VALUES ('Ventalis','Jane',  'Ventalis', 'janeventalis@ventalis.com',1003,'provisoire',2);
-
--- creation des utilisateurs (role=1)
-
-INSERT INTO Users (name,firstName,company,email,idcontact,hashpass,role)
-        VALUES ('Doe','John',  'JD inc.', 'johndoe@jd.com',2,'provisoire',1);
-INSERT INTO Users (name,firstName,company,email,idcontact,hashpass,role)
-        VALUES ('Doe','Jane',  'JD inc.', 'janedoe@jd.com',2,'provisoire',1);
-
+-- les utilisateurs (et l'admin sont a créer avec le script initusers.php
 
 -- creation des catégories
 
@@ -34,21 +15,5 @@ INSERT INTO Products (label,categorie,picture,description,price,stock)
 INSERT INTO Products (label,categorie,picture,description,price,stock) 
         VALUES ('Produit No3','bon rapport qualité prix','image/mdg.png','Produit ayant un trés bon rapport qualité prix',1254.20,4000);
         
--- creation de quelques commandes
--- l'état vaut 0 avant que la commande ne soit passée, puis 1 aprés achat
 
-INSERT INTO Orders (idUser,state) VALUES (4,1);  -- une commande de Johne Doe validée
-INSERT INTO Orders (idUser,state) VALUES (4,0);  --  panier non validé de Johne Doe
-
--- détail des paniers
-
-INSERT INTO CartElements (idProduct,volume,price,idOrder)  VALUES (1,1000,3100,1);
-INSERT INTO CartElements (idProduct,volume,price,idOrder)  VALUES (3,1000,500,1) ;  -- 2 articles dans la commande No1
-INSERT INTO CartElements (idProduct,volume,price,idOrder)  VALUES (2,1000,1200,1);   -- 1 article dans le panier
-
--- et quelques commentaires du personnel sur la commande No1
-
-INSERT INTO Comments (idOrder,comment) VALUES (1,'Commande en cours de préparation');
-INSERT INTO Comments (idOrder,comment) VALUES (1,'Commande expédiée');
-INSERT INTO Comments (idOrder,comment) VALUES (1,'Commande réceptionnée avec réserves (colis abimmé)');
 

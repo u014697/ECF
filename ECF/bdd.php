@@ -32,7 +32,7 @@ function checkLogin($user,$pass) {
         $checklo->execute();
         $result= $checklo->fetch(PDO::FETCH_ASSOC);
         if ($result && password_verify($pass,$result["hashpass"])) {    // le mdp coincide avec le mail !
-            return setLogin($user);
+               return setLogin($user);
         }
         return false;
     }
@@ -50,8 +50,8 @@ function setLogin($user) {
             $token = bin2hex(random_bytes(16));
             $settoken = $pdo->prepare("UPDATE users SET hashtoken=:token, expirationtoken=:expiration WHERE email=:email") ;
             $settoken->bindValue(':token', hash('md5', $token), PDO::PARAM_STR);
-            $expiration = date("Y/m/d",strtotime('+1 day'));    // le token est valable 1 jour aprés la derniere visite
-            $settoken->bindValue(':expiration', $expiration, PDO::PARAM_STR);
+            $expiration = time()+7200;    // le token est valable 2 heures aprés dernier accés
+            $settoken->bindValue(':expiration', $expiration, PDO::PARAM_INT);
             $settoken->bindValue(':email', $user, PDO::PARAM_STR);
             $settoken->execute();
             $_SESSION["token"] = $token;
@@ -88,14 +88,18 @@ function checkToken () {
 
     try {
         if (isset ($_SESSION["token"])) {
-            $checktok = $pdo->prepare('SELECT count(hashtoken) AS C FROM users WHERE hashtoken=:hashtoken');
+            $checktok = $pdo->prepare('SELECT * FROM users WHERE hashtoken=:hashtoken');
             $checktok->bindValue(':hashtoken', hash('md5', $_SESSION["token"]), PDO::PARAM_STR);
             $checktok->execute();
             $result= $checktok->fetch(PDO::FETCH_ASSOC);
-        
-            if ($result["C"] == 1) {    // le token a été trouvé !
-                return true; 
-            }    
+            if (!$result) return false;  // le token n'a pas été trouvé
+            if ($result["expirationToken"] < time()) return false;     // on verifie si le token n'est pas expiré 
+            $settoken = $pdo->prepare("UPDATE users SET expirationtoken=:expiration WHERE hashtoken=:hashtoken") ;
+            $expiration = time()+7200;    // le token est valable 2 heures aprés dernier accés
+            $settoken->bindValue(':expiration', $expiration, PDO::PARAM_INT); 
+            $settoken->bindValue(':hashtoken', hash('md5', $_SESSION["token"]), PDO::PARAM_STR);
+            $settoken->execute();   // on remet a jour la durée de validité du token 
+            return true;
         }
         return false;   
     }
@@ -121,10 +125,14 @@ function createUser ($email,$pass,$nom,$prenom,$societe,$newrole) {
         $email=strtolower($email);
 
         if ($newrole==1)  {  // pour un client, on recherche le conseillé le moins chargé pour lui affecter le client
-            $statement1 = $pdo->prepare('SELECT idcontact,count(idContact) AS C FROM users WHERE role=1 group by idContact ORDER BY C ASC Limit 1');
+            $statement1 = $pdo->prepare('SELECT users.idUser,count(utilisateurs.idUser) as C from users
+                                            left join users as utilisateurs on users.idUser=utilisateurs.idContact
+                                            where users.role=2
+                                            group by users.idUser
+                                            order by C asc Limit 1');
             $statement1->execute();
             $result= $statement1->fetch(PDO::FETCH_ASSOC);;
-            $idcontact=$result["idcontact"];
+            $idcontact=$result["idUser"];
         }
         else {
             $idcontact=0;
@@ -194,7 +202,7 @@ function modifmdp ($email,$pass,$tobechanged) {
         return true;
     }
     catch (PDOException $e) {
-        echo "<br><br>erreur interne !";
+        echo $e->getMessage();
         return false;
     }
 }
@@ -213,11 +221,12 @@ function sendmessage ($objet,$message) {
 
         // ensuite, on crée le message dans la table messages
 
-        $createmes = $pdo->prepare('INSERT INTO messages(idFrom,idTo,objet,message) VALUES (:from, :to, :objet, :message) ');   
+        $createmes = $pdo->prepare('INSERT INTO messages(idFrom,idTo,objet,message,time,state) VALUES (:from, :to, :objet, :message,:time,0) ');   
         $createmes->bindValue(':from', $client["idUser"], PDO::PARAM_STR);
         $createmes->bindValue(':to', $client["idContact"], PDO::PARAM_STR);
         $createmes->bindValue(':objet', htmlspecialchars($objet), PDO::PARAM_STR);
         $createmes->bindValue(':message', htmlspecialchars($message), PDO::PARAM_STR);
+        $createmes->bindValue(':time', time(), PDO::PARAM_INT);
         
         return $createmes->execute();
     }
@@ -298,7 +307,27 @@ function getmessage () {
     }
   }
 
- 
+  function getcomments ($idorder) {
+    global $pdo;
+
+        if (!isset ($_SESSION["token"])) return false;
+    
+    try {
+        // on lit les  commentaires sur la commande dans la table comments
+
+        $getmes = $pdo->prepare('SELECT * FROM comments WHERE idOrder=:idorder');   
+        $getmes->bindValue(':idorder', $idorder, PDO::PARAM_INT);
+        $getmes->execute();
+        return $getmes->fetchAll(PDO::FETCH_ASSOC);
+    }
+    catch (PDOException $e) {
+        echo $e->getMessage();
+
+        return false;
+    }
+  }
+
+
   function sendtoclient ($client,$objet,$message) {
     global $pdo;
 
@@ -310,11 +339,12 @@ function getmessage () {
         if (!$employe) return false;
 
         // ensuite, on enregistre le message
-        $mess = $pdo->prepare('INSERT INTO messages (idFrom,idTo,objet,message) VALUES (:idfrom,:idto,:objet,:message)');  
+        $mess = $pdo->prepare('INSERT INTO messages (idFrom,idTo,objet,message,time,state) VALUES (:idfrom,:idto,:objet,:message,:time,0)');  
         $mess->bindValue(':idfrom', $employe["idUser"], PDO::PARAM_INT);
         $mess->bindValue(':idto', $client, PDO::PARAM_INT);
         $mess->bindValue(':objet', htmlspecialchars($objet), PDO::PARAM_STR);
         $mess->bindValue(':message', htmlspecialchars($message), PDO::PARAM_STR);
+        $mess->bindValue(':time', time(), PDO::PARAM_INT);
         $mess->execute();
         return true;
         }
@@ -340,8 +370,9 @@ function getmessage () {
         $val->execute();
 
         // ensuite, on enregistre le commentaire
-        $mess = $pdo->prepare('INSERT INTO comments (idOrder,comment) VALUES (:idorder,:comment)');  
+        $mess = $pdo->prepare('INSERT INTO comments (idOrder,comment,time) VALUES (:idorder,:comment,:time)');  
         $mess->bindValue(':idorder', $idorder, PDO::PARAM_INT);
+        $mess->bindValue(':time', time(), PDO::PARAM_INT);
         $mess->bindValue(':comment', htmlspecialchars($comment), PDO::PARAM_STR);
         $mess->execute();
         return true;
@@ -378,8 +409,6 @@ function getmessage () {
 
   function createcategorie ($categorie) {
     global $pdo;
-
-        if (!isset ($_SESSION["token"])) return false;
  
         try {
             $createcat = $pdo->prepare('INSERT INTO categories(categorie) VALUES (:categorie) ');   
@@ -398,8 +427,6 @@ function getmessage () {
   function createProduct ($label,$categorie,$picture,$description,$price) {
     global $pdo;
 
-        if (!isset ($_SESSION["token"])) return false;
- 
         try {
             $createprod = $pdo->prepare('INSERT INTO products(label,categorie,picture,description,price,stock) 
                                         VALUES (:label,:categorie,:picture,:description,:price,100000) ');   
@@ -494,7 +521,7 @@ function getmessage () {
         }    
   }
 
-  // donne toutes les commandes créée d'un client 
+  // donne toutes les commandes avec le statut créée d'un client 
   function getorders ($iduser) {
     global $pdo;
 
@@ -504,11 +531,59 @@ function getmessage () {
 
             //enfin on lit les cart elements correspondants aux commandes crées par l'utilisateur en pramétre, eton y adjoint le nom des produits
 
-            $atc = $pdo->prepare('SELECT orders.idOrder,cartelements.idCartElement,cartelements.idProduct,cartelements.idProduct,cartelements.volume,cartelements.price,cartelements.idOrder,products.label FROM orders
+            $atc = $pdo->prepare('SELECT orders.idOrder,orders.time,cartelements.idCartElement,cartelements.idProduct,cartelements.idProduct,cartelements.volume,cartelements.price,cartelements.idOrder,products.label FROM orders
                                         JOIN cartelements ON cartelements.idOrder=orders.idOrder
                                         JOIN products ON products.idProduct=cartelements.idProduct
                                         WHERE orders.idUser=:iduser and orders.state=1');   
             $atc->bindValue(':iduser', $iduser, PDO::PARAM_STR);
+            $atc->execute();   
+            return $atc->fetchAll(PDO::FETCH_ASSOC);
+        }
+        catch (PDOException $e) {
+            echo $e->getMessage();
+            return false;
+        }    
+  }
+
+  // donne toutes les commandes quelque soit le statut (sauf panier) créée d'un client 
+  function getallorders ($iduser) {
+    global $pdo;
+
+        if (!isset ($_SESSION["token"])) return false;
+ 
+        try {
+
+            //enfin on lit les cart elements correspondants aux commandes crées par l'utilisateur en pramétre, eton y adjoint le nom des produits
+
+            $atc = $pdo->prepare('SELECT orders.idOrder,orders.time,cartelements.idCartElement,cartelements.idProduct,cartelements.idProduct,cartelements.volume,cartelements.price,cartelements.idOrder,products.label FROM orders
+                                        JOIN cartelements ON cartelements.idOrder=orders.idOrder
+                                        JOIN products ON products.idProduct=cartelements.idProduct
+                                        WHERE orders.idUser=:iduser and orders.state!=0');   
+            $atc->bindValue(':iduser', $iduser, PDO::PARAM_STR);
+            $atc->execute();   
+            return $atc->fetchAll(PDO::FETCH_ASSOC);
+        }
+        catch (PDOException $e) {
+            echo $e->getMessage();
+            return false;
+        }    
+  }
+
+  // donne les détails d'une commande 
+  function getoneorder ($idorder) {
+    global $pdo;
+
+        if (!isset ($_SESSION["token"])) return false;
+ 
+        try {
+
+            //on lit les cart elements correspondants à la commande en pramétre, eton y adjoint le nom des produits
+
+            $atc = $pdo->prepare('SELECT orders.idOrder,orders.time,cartelements.idCartElement,cartelements.idProduct,cartelements.idProduct,cartelements.volume,cartelements.price,cartelements.idOrder,products.label,products.picture FROM orders
+                                        JOIN cartelements ON cartelements.idOrder=orders.idOrder
+                                        JOIN products ON products.idProduct=cartelements.idProduct
+                                        WHERE orders.idOrder=:idorder and orders.state!=0');   
+            $atc->bindValue(':idorder', $idorder, PDO::PARAM_STR);
             $atc->execute();   
             return $atc->fetchAll(PDO::FETCH_ASSOC);
         }
@@ -572,8 +647,9 @@ function getmessage () {
     
             //enfin on passe le panier en commande
 
-            $atc = $pdo->prepare('UPDATE orders SET state=1 WHERE state=0 AND idUser=:user');
+            $atc = $pdo->prepare('UPDATE orders SET state=1,time=:time WHERE state=0 AND idUser=:user');
             $atc->bindValue(':user', $user["idUser"], PDO::PARAM_STR);
+            $atc->bindValue(':time', time(), PDO::PARAM_INT);
             $atc->execute();   
             return true;
         }

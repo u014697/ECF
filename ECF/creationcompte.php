@@ -49,7 +49,7 @@ if (isset ($_POST["inscrire"])) {
                 </div>
             </form>  
     </div>
-</div>
+    </div>
 
     </main>
 

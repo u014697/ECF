@@ -18,75 +18,94 @@ require "head.php";
     <?php
         $message="";
         if (isset ($_POST["envoyer"])) {
-            if (sendmessage($_POST["objet"],$_POST["message"])) {
-            $message="message envoyé";
+            if(sendtoclient($_POST["client"],$_POST["objet"],$_POST["message"])) {
+                $message ="le message a été envoyé";
             }
             else {
-            $message="echec de l'envoi de message";
+                $message ="erreur d'envoi du message";
             }
+
         }
+    
     ?>
     <main>
-    <?php require "console.php" ?>
+    <?php 
+        require "console.php" ;
+        $user=getUser();
+        $vendor=getClient($user["idContact"]);
+    ?>
 
     <div class="contain">
-
     <div class="formulaire">
-        <h2>mes commandes</h2>
-        <?php
-            $result=getcommande();
-        ?>
-        <table class="centered">
-            <tr>
-                <th>commande</th>
-                <th>état</th>
-                <th>produit</th>
-                <th>prix</th>
-                <th>quantité</th>
-            </tr>
-            <?php
-            foreach ($result as $commande) {
-                echo "<tr>";
-                echo "<td>".$commande["idorder"]."</td>";
-                if ($commande["state"]==0){
-                    echo "<td>panier</td>";
-                }
-                elseif ($commande["state"]==1){
-                    echo "<td>crée</td>";
-                }
-                elseif ($commande["state"]==2){
-                    echo "<td>validée</td>";
+        <h2>commandes de  <?php echo $user["firstName"]." ".$user["name"]?></h2>
+            <?php 
+                $result=getallorders($user["idUser"]); 
+                if ($result) {
+                    $first=true;
+                    $current=0;
+                    foreach ($result as $order) {
+                        if ($order["idOrder"]!=$current) {
+                            $current=$order["idOrder"];
+                            if (!$first) {
+                                echo "</table>";
+                            }
+                            $first=false;
+                            echo "<br>commande référence <a href='viewmyorder.php?order=".$current."'>No :".$current."</a>";
+                            echo '<br>date : '.date ("d m Y h:i:s",$order["time"]).'<br>';                       
+                            echo "<table><tr><th>article</th><th>prix</th><th>quantité</th><th></th></tr>";
+                        }
+                        echo '<tr>';
+                        echo '<td style="width:75%">'.$order["label"].'</td>';                       
+                        echo '<td>'.$order["price"].'</td>';                       
+                        echo '<td>'.$order["volume"].'</td>'; 
+                        echo '</tr>';
+                      
+                    } 
+                    if (!$first) {
+                        echo "</table>";
+                    }
                 }
                 else {
-                    echo "<td>inconnu</td>";
-                }
-                echo "<td>".$commande["label"]."</td>";
-                echo "<td>".$commande["price"]."</td>";
-                echo "<td>".$commande["volume"]."</td>";
-                echo "</tr>"; 
-            } 
+                    echo "<div class='element'>vous n'avez aucune commande</div>";
+                }              
             ?> 
-        </table>
     </div>
     <div class="formulaire">
-        <h2>Contacter mon conseillé </h2>
+
+        <h2>Message de votre conseillé <?php echo $vendor["firstName"]." ".$vendor["name"] ?></h2>
+
+            <?php 
+                $result=getmessagefrom($vendor["idUser"]); 
+                if ($result) {
+                    foreach ($result as $message) {
+                        echo 'objet : '.$message["objet"].'<br>';                       
+                        echo 'date : '.date ("d m Y h:i:s",$message["time"]).'<br>';                       
+                        echo 'message : '.$message["message"].'<br><br>';                       
+                    }
+                } 
+                else {
+                    echo "<div class='element'> vous n'avez aucun message</div>";
+                }
+                ?> 
+            <h3> Répondre à <?php echo $vendor["firstName"]." ".$vendor["name"] ?></h3>
             <form  method="post">
                 <div class="element">
                     <label for="objet">Objet    : </label>
-                    <input  type="text" size="50" id="objet" name="objet" placeholder="objet" required/>
+                    <input  type="text" id="objet" name="objet" placeholder="objet" required/>
+                    <input  type="hidden"  id="client" name="client" value="<?php echo $vendor["idUser"] ?>"/>
                 </div>
                 <div>
                     <label for="message">Message :</label>
-                    <textarea  rows="5" cols="50" id="message"  name="message" placeholder="votre message" required></textarea>
+                    <textarea  rows="5"  id="message"  name="message" placeholder="votre message" required></textarea>
                 </div>
+
                 <div class="element">
-                    <button class="formbutton" type="submit" id="envoyer" name="envoyer">Envoyer</button>
+                    <button class="formbutton" type="submit" id="envoyer" name="envoyer">Envoyer un message</button>
                 </div>
             </form>  
     </div>
-
-
     </div>
+    </main>
     <?php
         require "footer.php";
     ?>
