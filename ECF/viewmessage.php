@@ -48,12 +48,18 @@ require "head.php";
         <h2>Recu de <?php echo $client["firstName"]." ".$client["name"] ?></h2>
             <?php 
                 $result=getmessagefrom($client["idUser"]);
-                foreach ($result as $message) {
-                    echo 'objet : '.$message["objet"].'<br>';                       
-                    echo 'envoyé le : '.date ("d m Y h:i:s",$message["time"]).'<br>';                       
-                    echo 'message : '.$message["message"].'<br><br>';                       
-                } 
-            ?> 
+                if (!$result) {
+                    echo "aucun message recu <br>";
+                }
+                else {
+                    foreach ($result as $message) {
+                        echo 'objet : '.$message["objet"].'<br>';                       
+                        echo 'envoyé le : '.date ("d m Y h:i:s",$message["time"]).'<br>';                       
+                        echo 'message : '.$message["message"].'<br><br>';                       
+                    } 
+    
+                }
+             ?> 
             <h3> Répondre à <?php echo $client["firstName"]." ".$client["name"] ?></h3>
             <form  method="post">
                 <div class="element">

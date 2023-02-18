@@ -1,5 +1,6 @@
 <?php           // traitement de la deconnexion
 if (isset ($_GET["deconnexion"])) {
+    resetToken();       //on périme la date d'expiration du token
     $_SESSION["token"]=null;
     unset ($_SESSION["token"]);
     header ("location:acceuil.php");

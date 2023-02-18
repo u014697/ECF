@@ -118,7 +118,7 @@ footer {
 }
 .formulaire{
     min-width:25%;
-    max-width:60%;
+    max-width:50%;
     display: inline-block;
     background-color : white;
     border : 1px black solid;

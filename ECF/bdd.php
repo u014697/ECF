@@ -108,6 +108,32 @@ function checkToken () {
     }
 }
 
+// on vérifie que le token est présent et valide dans la BDD
+function resetToken () {
+    global $pdo;
+
+    try {
+        if (isset ($_SESSION["token"])) {
+            $checktok = $pdo->prepare('SELECT * FROM users WHERE hashtoken=:hashtoken');
+            $checktok->bindValue(':hashtoken', hash('md5', $_SESSION["token"]), PDO::PARAM_STR);
+            $checktok->execute();
+            $result= $checktok->fetch(PDO::FETCH_ASSOC);
+            if (!$result) return false;  // le token n'a pas été trouvé
+            if ($result["expirationToken"] < time()) return false;     // on verifie si le token n'est pas expiré 
+            $settoken = $pdo->prepare("UPDATE users SET expirationtoken=:expiration WHERE hashtoken=:hashtoken") ;
+            $expiration = time()-1;    // le token est est expiré depuis 1 seconde
+            $settoken->bindValue(':expiration', $expiration, PDO::PARAM_INT); 
+            $settoken->bindValue(':hashtoken', hash('md5', $_SESSION["token"]), PDO::PARAM_STR);
+            $settoken->execute();   // on remet a jour la durée de validité du token 
+            return true;
+        }
+        return false;   
+    }
+    catch (PDOException $e) {
+        return false;
+    }
+}
+
 // on lit le role correspondant au token 
 
 function checkRole () {

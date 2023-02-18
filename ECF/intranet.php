@@ -39,15 +39,6 @@ require "head.php";
                 $message ="erreur dans le chargement de l'image";
             }
         }
-        elseif (isset ($_POST["envoyer"])) {
-            if(sendtoclient($_POST["radio"],$_POST["objet"],$_POST["message"])) {
-                $message ="le message a été envoyé";
-            }
-            else {
-                $message ="erreur d'envoi du message";
-            }
-
-        }
     
     ?>
     <main>
@@ -120,12 +111,7 @@ require "head.php";
                         $ordcount=getordercount($client["idUser"]);
                         echo '<tr>';                       
                         echo '<td>'.$client["firstName"].' '.$client["name"].' ('.$client["email"].') </td>';
-                        if ($mescount>0) {
-                            echo '<td><a href="viewmessage.php?fromuser='.$client["idUser"].'">'.$mescount.'</a></td>';
-                        }
-                        else {
-                            echo '<td>'.$mescount.'</td>';
-                        }
+                        echo '<td><a href="viewmessage.php?fromuser='.$client["idUser"].'">'.$mescount.'</a></td>';
                         if ($ordcount>0){
                             echo '<td><a href="vieworder.php?fromuser='.$client["idUser"].'">'.$ordcount.'</a></td>';
                         }
@@ -136,19 +122,6 @@ require "head.php";
                     } 
                 ?> 
                 </table>
-                <div class="element">
-                </div>
-                <div class="element">
-                    <label for="objet">Objet    : </label>
-                    <input  type="text"  id="objet" name="objet" placeholder="objet" required/>
-                </div>
-                <div>
-                    <label for="message">Message :</label>
-                    <textarea  rows="5"  id="message"  name="message" placeholder="votre message" required></textarea>
-                </div>
-                <div class="element">
-                    <button class="formbutton" type="submit" id="envoyer" name="envoyer">Envoyer un message</button>
-                </div>
             </form>  
     </div>
     </div>
